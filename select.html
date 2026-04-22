@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Level 30 — Choose Your Fighter</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --red: #ff1a1a;
+      --gold: #ffd700;
+      --dark: #05050f;
+      --players: #Carson #00cfff, #Wyatt #ff6600, #Chris #00ff88, #Danny #cc44ff;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: var(--dark);
+      color: #fff;
+      font-family: 'Share Tech Mono', monospace;
+      min-height: 100vh;
+      overflow-x: hidden;
+      cursor: crosshair;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: repeating-linear-gradient(
+        0deg, transparent, transparent 2px,
+        rgba(0,0,0,0.1) 2px, rgba(0,0,0,0.1) 4px
+      );
+      pointer-events: none;
+      z-index: 999;
+    }
+
+    .bg-grid {
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(255,26,26,0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,26,26,0.05) 1px, transparent 1px);
+      background-size: 60px 60px;
+      animation: grid-move 20s linear infinite;
+      z-index: 0;
+    }
+
+    @keyframes grid-move {
+      0% { background-position: 0 0; }
+      100% { background-position: 60px 60px; }
+    }
+
+    .content {
+      position: relative;
+      z-index: 10;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 20px;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 50px;
+    }
+
+    .header-eyebrow {
+      font-family: 'Orbitron', monospace;
+      font-size: 11px;
+      letter-spacing: 5px;
+      color: var(--red);
+      margin-bottom: 12px;
+    }
+
+    .header-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(40px, 8vw, 70px);
+      letter-spacing: 4px;
+      background: linear-gradient(180deg, #fff 0%, rgba(255,255,255,0.6) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .header-sub {
+      font-size: 11px;
+      letter-spacing: 3px;
+      color: rgba(255,255,255,0.4);
+      margin-top: 8px;
+    }
+
+    .players-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+      max-width: 700px;
+      width: 100%;
+    }
+
+    @media (max-width: 480px) {
+      .players-grid {
+        grid-template-columns: 1fr;
+        max-width: 320px;
+      }
+    }
+
+    .player-card {
+      position: relative;
+      padding: 32px 24px;
+      border: 1px solid;
+      cursor: pointer;
+      text-decoration: none;
+      display: block;
+      overflow: hidden;
+      transition: all 0.3s;
+      clip-path: polygon(15px 0%, 100% 0%, calc(100% - 15px) 100%, 0% 100%);
+    }
+
+    .player-card[data-player="Carson"] { border-color: rgba(0,207,255,0.4); }
+    .player-card[data-player="Wyatt"]  { border-color: rgba(255,102,0,0.4); }
+    .player-card[data-player="Chris"]  { border-color: rgba(0,255,136,0.4); }
+    .player-card[data-player="Danny"]  { border-color: rgba(204,68,255,0.4); }
+
+    .player-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .player-card[data-player="Carson"]::before { background: radial-gradient(ellipse at center, rgba(0,207,255,0.12), transparent 70%); }
+    .player-card[data-player="Wyatt"]::before  { background: radial-gradient(ellipse at center, rgba(255,102,0,0.12), transparent 70%); }
+    .player-card[data-player="Chris"]::before  { background: radial-gradient(ellipse at center, rgba(0,255,136,0.12), transparent 70%); }
+    .player-card[data-player="Danny"]::before  { background: radial-gradient(ellipse at center, rgba(204,68,255,0.12), transparent 70%); }
+
+    .player-card:hover::before { opacity: 1; }
+
+    .player-card[data-player="Carson"]:hover { border-color: #00cfff; box-shadow: 0 0 30px rgba(0,207,255,0.3), inset 0 0 30px rgba(0,207,255,0.05); transform: translateY(-4px); }
+    .player-card[data-player="Wyatt"]:hover  { border-color: #ff6600; box-shadow: 0 0 30px rgba(255,102,0,0.3), inset 0 0 30px rgba(255,102,0,0.05); transform: translateY(-4px); }
+    .player-card[data-player="Chris"]:hover  { border-color: #00ff88; box-shadow: 0 0 30px rgba(0,255,136,0.3), inset 0 0 30px rgba(0,255,136,0.05); transform: translateY(-4px); }
+    .player-card[data-player="Danny"]:hover  { border-color: #cc44ff; box-shadow: 0 0 30px rgba(204,68,255,0.3), inset 0 0 30px rgba(204,68,255,0.05); transform: translateY(-4px); }
+
+    .player-number {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 80px;
+      line-height: 1;
+      opacity: 0.08;
+      position: absolute;
+      top: 10px;
+      right: 15px;
+    }
+
+    .player-card[data-player="Carson"] .player-number { color: #00cfff; }
+    .player-card[data-player="Wyatt"]  .player-number { color: #ff6600; }
+    .player-card[data-player="Chris"]  .player-number { color: #00ff88; }
+    .player-card[data-player="Danny"]  .player-number { color: #cc44ff; }
+
+    .player-tag {
+      font-size: 9px;
+      letter-spacing: 3px;
+      color: rgba(255,255,255,0.4);
+      margin-bottom: 12px;
+      text-transform: uppercase;
+    }
+
+    .player-name {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 52px;
+      letter-spacing: 2px;
+      line-height: 1;
+      margin-bottom: 16px;
+      position: relative;
+    }
+
+    .player-card[data-player="Carson"] .player-name { color: #00cfff; }
+    .player-card[data-player="Wyatt"]  .player-name { color: #ff6600; }
+    .player-card[data-player="Chris"]  .player-name { color: #00ff88; }
+    .player-card[data-player="Danny"]  .player-name { color: #cc44ff; }
+
+    .player-enter {
+      font-size: 10px;
+      letter-spacing: 3px;
+      color: rgba(255,255,255,0.35);
+      text-transform: uppercase;
+      transition: color 0.3s;
+    }
+
+    .player-card:hover .player-enter {
+      color: rgba(255,255,255,0.7);
+    }
+
+    .player-enter::after {
+      content: ' →';
+    }
+
+    .corner-tl, .corner-br {
+      position: absolute;
+      width: 10px;
+      height: 10px;
+    }
+
+    .corner-tl {
+      top: 6px; left: 14px;
+      border-top: 1px solid;
+      border-left: 1px solid;
+    }
+
+    .corner-br {
+      bottom: 6px; right: 14px;
+      border-bottom: 1px solid;
+      border-right: 1px solid;
+    }
+
+    .player-card[data-player="Carson"] .corner-tl,
+    .player-card[data-player="Carson"] .corner-br { border-color: #00cfff; }
+    .player-card[data-player="Wyatt"]  .corner-tl,
+    .player-card[data-player="Wyatt"]  .corner-br { border-color: #ff6600; }
+    .player-card[data-player="Chris"]  .corner-tl,
+    .player-card[data-player="Chris"]  .corner-br { border-color: #00ff88; }
+    .player-card[data-player="Danny"]  .corner-tl,
+    .player-card[data-player="Danny"]  .corner-br { border-color: #cc44ff; }
+
+    .footer-text {
+      margin-top: 50px;
+      font-size: 10px;
+      letter-spacing: 3px;
+      color: rgba(255,255,255,0.2);
+      text-align: center;
+    }
+
+    /* Admin link */
+    .admin-link {
+      margin-top: 20px;
+      font-size: 10px;
+      letter-spacing: 2px;
+      color: rgba(255,255,255,0.15);
+      text-decoration: none;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      transition: color 0.3s;
+    }
+    .admin-link:hover { color: var(--gold); }
+
+    /* Announcement bar for alerts */
+    .alert-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      background: var(--red);
+      color: #fff;
+      text-align: center;
+      font-size: 11px;
+      letter-spacing: 2px;
+      padding: 10px;
+      z-index: 1000;
+      display: none;
+      font-family: 'Orbitron', monospace;
+    }
+
+    .alert-bar.show { display: block; }
+  </style>
+</head>
+<body>
+
+<div class="alert-bar" id="alertBar"></div>
+<div class="bg-grid"></div>
+
+<div class="content">
+  <div class="header">
+    <div class="header-eyebrow">// Level 30 · No Sleep No Mercy //</div>
+    <div class="header-title">Choose Your Fighter</div>
+    <div class="header-sub">Select your player to enter your command center</div>
+  </div>
+
+  <div class="players-grid">
+    <a href="player.html?player=Carson" class="player-card" data-player="Carson">
+      <div class="corner-tl"></div>
+      <div class="corner-br"></div>
+      <div class="player-number">1</div>
+      <div class="player-tag">// Player 01</div>
+      <div class="player-name">Carson</div>
+      <div class="player-enter">Enter HQ</div>
+    </a>
+
+    <a href="player.html?player=Wyatt" class="player-card" data-player="Wyatt">
+      <div class="corner-tl"></div>
+      <div class="corner-br"></div>
+      <div class="player-number">2</div>
+      <div class="player-tag">// Player 02</div>
+      <div class="player-name">Wyatt</div>
+      <div class="player-enter">Enter HQ</div>
+    </a>
+
+    <a href="player.html?player=Chris" class="player-card" data-player="Chris">
+      <div class="corner-tl"></div>
+      <div class="corner-br"></div>
+      <div class="player-number">3</div>
+      <div class="player-tag">// Player 03</div>
+      <div class="player-name">Chris</div>
+      <div class="player-enter">Enter HQ</div>
+    </a>
+
+    <a href="player.html?player=Danny" class="player-card" data-player="Danny">
+      <div class="corner-tl"></div>
+      <div class="corner-br"></div>
+      <div class="player-number">4</div>
+      <div class="player-tag">// Player 04</div>
+      <div class="player-name">Danny</div>
+      <div class="player-enter">Enter HQ</div>
+    </a>
+  </div>
+
+  <div class="footer-text">May 2nd · 11PM–8AM · 9 Rounds · No Mercy</div>
+</div>
+
+<script src="js/config.js"></script>
+<script>
+  // Check for any pending sabotage alerts
+  function checkAlerts() {
+    const state = getGameState();
+    const pending = state.sabotageQueue.filter(s => s.round === state.currentRound && !s.shown);
+    if (pending.length > 0) {
+      const bar = document.getElementById('alertBar');
+      bar.textContent = `⚠ SABOTAGE ALERT: ${pending.length} player(s) have been targeted this round! Check your screen!`;
+      bar.classList.add('show');
+    }
+  }
+
+  checkAlerts();
+</script>
+</body>
+</html>

@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Level 30 — No Sleep No Mercy</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --red: #ff1a1a;
+      --gold: #ffd700;
+      --dark: #05050f;
+      --darker: #020208;
+      --glow-red: 0 0 20px #ff1a1a88, 0 0 60px #ff1a1a44;
+      --glow-gold: 0 0 20px #ffd70088, 0 0 60px #ffd70044;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: var(--dark);
+      color: #fff;
+      font-family: 'Share Tech Mono', monospace;
+      min-height: 100vh;
+      overflow-x: hidden;
+      cursor: crosshair;
+    }
+
+    /* Scanlines overlay */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(0,0,0,0.15) 2px,
+        rgba(0,0,0,0.15) 4px
+      );
+      pointer-events: none;
+      z-index: 999;
+    }
+
+    /* Animated background grid */
+    .bg-grid {
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(255,26,26,0.07) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,26,26,0.07) 1px, transparent 1px);
+      background-size: 60px 60px;
+      animation: grid-move 20s linear infinite;
+      z-index: 0;
+    }
+
+    @keyframes grid-move {
+      0% { background-position: 0 0; }
+      100% { background-position: 60px 60px; }
+    }
+
+    /* Particles */
+    .particles {
+      position: fixed;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
+      overflow: hidden;
+    }
+
+    .particle {
+      position: absolute;
+      width: 2px;
+      height: 2px;
+      border-radius: 50%;
+      animation: float-up linear infinite;
+    }
+
+    @keyframes float-up {
+      0% { transform: translateY(110vh) translateX(0); opacity: 0; }
+      10% { opacity: 1; }
+      90% { opacity: 0.5; }
+      100% { transform: translateY(-10vh) translateX(var(--drift)); opacity: 0; }
+    }
+
+    .content {
+      position: relative;
+      z-index: 10;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 20px;
+    }
+
+    /* Badge */
+    .badge {
+      font-family: 'Orbitron', monospace;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 4px;
+      color: var(--red);
+      text-transform: uppercase;
+      border: 1px solid var(--red);
+      padding: 6px 18px;
+      margin-bottom: 30px;
+      animation: pulse-border 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse-border {
+      0%, 100% { box-shadow: 0 0 5px var(--red); }
+      50% { box-shadow: var(--glow-red); }
+    }
+
+    /* Main Title */
+    .title-wrap {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .title-level {
+      font-family: 'Orbitron', monospace;
+      font-size: clamp(14px, 3vw, 22px);
+      font-weight: 400;
+      letter-spacing: 12px;
+      color: rgba(255,255,255,0.5);
+      display: block;
+      margin-bottom: 10px;
+    }
+
+    .title-30 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(120px, 25vw, 220px);
+      line-height: 0.85;
+      display: block;
+      background: linear-gradient(180deg, #ffffff 0%, #ff1a1a 50%, #8b0000 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      filter: drop-shadow(0 0 30px rgba(255,26,26,0.6));
+      animation: title-pulse 3s ease-in-out infinite;
+    }
+
+    @keyframes title-pulse {
+      0%, 100% { filter: drop-shadow(0 0 30px rgba(255,26,26,0.6)); }
+      50% { filter: drop-shadow(0 0 60px rgba(255,26,26,0.9)) drop-shadow(0 0 100px rgba(255,26,26,0.4)); }
+    }
+
+    .tagline {
+      font-family: 'Orbitron', monospace;
+      font-size: clamp(12px, 2.5vw, 18px);
+      font-weight: 900;
+      letter-spacing: 6px;
+      color: var(--gold);
+      text-shadow: var(--glow-gold);
+      margin-top: 15px;
+      text-transform: uppercase;
+    }
+
+    /* Divider */
+    .divider {
+      width: min(500px, 90vw);
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--red), var(--gold), var(--red), transparent);
+      margin: 40px 0;
+      position: relative;
+    }
+
+    .divider::before {
+      content: '◆';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: var(--gold);
+      font-size: 12px;
+      background: var(--dark);
+      padding: 0 10px;
+    }
+
+    /* Invite card */
+    .invite-card {
+      background: rgba(255,26,26,0.05);
+      border: 1px solid rgba(255,26,26,0.3);
+      padding: 40px;
+      max-width: 560px;
+      width: 90%;
+      text-align: center;
+      position: relative;
+      animation: card-flicker 8s ease-in-out infinite;
+    }
+
+    @keyframes card-flicker {
+      0%, 95%, 100% { opacity: 1; }
+      96% { opacity: 0.85; }
+      97% { opacity: 1; }
+      98% { opacity: 0.9; }
+    }
+
+    .invite-card::before,
+    .invite-card::after {
+      content: '';
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      border-color: var(--gold);
+      border-style: solid;
+    }
+    .invite-card::before { top: -1px; left: -1px; border-width: 2px 0 0 2px; }
+    .invite-card::after  { bottom: -1px; right: -1px; border-width: 0 2px 2px 0; }
+
+    .invite-sub {
+      font-size: 11px;
+      letter-spacing: 4px;
+      color: var(--gold);
+      text-transform: uppercase;
+      margin-bottom: 24px;
+    }
+
+    .invite-headline {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(32px, 7vw, 52px);
+      letter-spacing: 3px;
+      line-height: 1.1;
+      margin-bottom: 20px;
+      color: #fff;
+    }
+
+    .invite-headline span {
+      color: var(--red);
+    }
+
+    .invite-details {
+      font-size: 13px;
+      line-height: 2;
+      color: rgba(255,255,255,0.7);
+      margin-bottom: 30px;
+    }
+
+    .invite-details strong {
+      color: #fff;
+      font-weight: normal;
+    }
+
+    .invite-date {
+      font-family: 'Orbitron', monospace;
+      font-size: clamp(16px, 3vw, 22px);
+      font-weight: 700;
+      color: var(--gold);
+      text-shadow: var(--glow-gold);
+      margin-bottom: 6px;
+    }
+
+    .invite-time {
+      font-size: 13px;
+      color: rgba(255,255,255,0.6);
+      margin-bottom: 30px;
+      letter-spacing: 2px;
+    }
+
+    /* Stats row */
+    .stats-row {
+      display: flex;
+      justify-content: center;
+      gap: 30px;
+      margin-bottom: 36px;
+    }
+
+    .stat {
+      text-align: center;
+    }
+
+    .stat-num {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 36px;
+      color: var(--red);
+      display: block;
+      line-height: 1;
+    }
+
+    .stat-label {
+      font-size: 9px;
+      letter-spacing: 2px;
+      color: rgba(255,255,255,0.4);
+      text-transform: uppercase;
+    }
+
+    /* CTA Button */
+    .cta-btn {
+      display: inline-block;
+      font-family: 'Orbitron', monospace;
+      font-weight: 900;
+      font-size: 14px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--dark);
+      background: linear-gradient(135deg, var(--red), #cc0000);
+      border: none;
+      padding: 18px 50px;
+      cursor: pointer;
+      text-decoration: none;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s;
+      clip-path: polygon(10px 0%, 100% 0%, calc(100% - 10px) 100%, 0% 100%);
+    }
+
+    .cta-btn::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, #fff2, transparent);
+      transform: translateX(-100%);
+      transition: transform 0.4s;
+    }
+
+    .cta-btn:hover::before { transform: translateX(100%); }
+
+    .cta-btn:hover {
+      box-shadow: var(--glow-red), 0 10px 30px rgba(255,26,26,0.5);
+      transform: translateY(-2px) scale(1.03);
+    }
+
+    .cta-sub {
+      margin-top: 14px;
+      font-size: 10px;
+      letter-spacing: 2px;
+      color: rgba(255,255,255,0.3);
+    }
+
+    /* Players preview */
+    .players-preview {
+      display: flex;
+      gap: 12px;
+      margin-top: 40px;
+      justify-content: center;
+    }
+
+    .player-dot {
+      width: 40px;
+      height: 40px;
+      border: 1px solid rgba(255,26,26,0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 16px;
+      color: rgba(255,255,255,0.4);
+      transition: all 0.3s;
+      clip-path: polygon(5px 0%, 100% 0%, calc(100% - 5px) 100%, 0% 100%);
+    }
+
+    .player-dot:hover {
+      border-color: var(--red);
+      color: var(--red);
+      background: rgba(255,26,26,0.1);
+    }
+
+    /* Flash warning */
+    .warning-strip {
+      font-size: 10px;
+      letter-spacing: 3px;
+      color: rgba(255,26,26,0.6);
+      text-align: center;
+      margin-top: 30px;
+      animation: blink 2s step-end infinite;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.2; }
+    }
+
+    /* Glitch effect on hover of title */
+    .title-30:hover {
+      animation: glitch 0.3s steps(2) infinite;
+    }
+
+    @keyframes glitch {
+      0% { transform: translate(0); }
+      20% { transform: translate(-3px, 1px); filter: hue-rotate(90deg) drop-shadow(0 0 30px rgba(255,26,26,0.6)); }
+      40% { transform: translate(3px, -1px); }
+      60% { transform: translate(-1px, 2px); }
+      80% { transform: translate(1px, -2px); }
+      100% { transform: translate(0); }
+    }
+  </style>
+</head>
+<body>
+
+<div class="bg-grid"></div>
+<div class="particles" id="particles"></div>
+
+<div class="content">
+  <div class="badge">⚠ Classified Transmission ⚠</div>
+
+  <div class="title-wrap">
+    <span class="title-level">Level</span>
+    <span class="title-30">30</span>
+    <div class="tagline">No Sleep · No Mercy</div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="invite-card">
+    <div class="invite-sub">// You have been selected //</div>
+
+    <div class="invite-headline">
+      Join<br><span>If You Dare</span>
+    </div>
+
+    <div class="invite-details">
+      Four players. Nine battles.<br>
+      One legendary night of<br>
+      <strong>video games, board games & chaos.</strong>
+    </div>
+
+    <div class="invite-date">Saturday, May 2nd</div>
+    <div class="invite-time">11:00 PM — 8:00 AM &nbsp;·&nbsp; 9 HOURS OF WAR</div>
+
+    <div class="stats-row">
+      <div class="stat">
+        <span class="stat-num">9</span>
+        <span class="stat-label">Rounds</span>
+      </div>
+      <div class="stat">
+        <span class="stat-num">4</span>
+        <span class="stat-label">Players</span>
+      </div>
+      <div class="stat">
+        <span class="stat-num">4</span>
+        <span class="stat-label">Sabotages</span>
+      </div>
+    </div>
+
+    <a href="select.html" class="cta-btn">Enter If You Dare</a>
+    <div class="cta-sub">[ tap to accept your fate ]</div>
+  </div>
+
+  <div class="players-preview">
+    <div class="player-dot">C</div>
+    <div class="player-dot">W</div>
+    <div class="player-dot">C</div>
+    <div class="player-dot">D</div>
+  </div>
+
+  <div class="warning-strip">▸ WARNING: NO SLEEP PERMITTED ◂</div>
+</div>
+
+<script>
+  // Generate floating particles
+  const container = document.getElementById('particles');
+  const colors = ['#ff1a1a', '#ffd700', '#ff6600', '#ffffff'];
+
+  for (let i = 0; i < 40; i++) {
+    const p = document.createElement('div');
+    p.className = 'particle';
+    const color = colors[Math.floor(Math.random() * colors.length)];
+    p.style.cssText = `
+      left: ${Math.random() * 100}%;
+      background: ${color};
+      box-shadow: 0 0 4px ${color};
+      animation-duration: ${6 + Math.random() * 12}s;
+      animation-delay: ${-Math.random() * 15}s;
+      --drift: ${(Math.random() - 0.5) * 100}px;
+      width: ${1 + Math.random() * 2}px;
+      height: ${1 + Math.random() * 2}px;
+    `;
+    container.appendChild(p);
+  }
+</script>
+</body>
+</html>

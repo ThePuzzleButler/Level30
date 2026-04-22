@@ -1,0 +1,1345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Level 30 — Player HQ</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --red: #ff1a1a;
+      --gold: #ffd700;
+      --dark: #05050f;
+      --pc: #00cfff;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: var(--dark);
+      color: #fff;
+      font-family: 'Share Tech Mono', monospace;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0,0,0,0.08) 3px, rgba(0,0,0,0.08) 4px);
+      pointer-events: none;
+      z-index: 900;
+    }
+
+    /* ===== SABOTAGE ALERT OVERLAY ===== */
+    .sabotage-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.95);
+      z-index: 2000;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 30px;
+      animation: overlay-flash 0.5s;
+    }
+
+    .sabotage-overlay.active { display: flex; }
+
+    @keyframes overlay-flash {
+      0%, 100% { background: rgba(0,0,0,0.95); }
+      50% { background: rgba(255,26,26,0.3); }
+    }
+
+    .sabotage-alert-icon { font-size: 80px; margin-bottom: 20px; }
+    .sabotage-alert-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 60px;
+      color: var(--red);
+      letter-spacing: 4px;
+      margin-bottom: 10px;
+    }
+    .sabotage-alert-name {
+      font-family: 'Orbitron', monospace;
+      font-size: 28px;
+      color: var(--gold);
+      margin-bottom: 16px;
+    }
+    .sabotage-alert-desc {
+      font-size: 16px;
+      color: rgba(255,255,255,0.7);
+      max-width: 400px;
+      line-height: 1.8;
+      margin-bottom: 10px;
+    }
+    .sabotage-alert-from {
+      font-size: 12px;
+      color: rgba(255,255,255,0.4);
+      letter-spacing: 2px;
+      margin-bottom: 40px;
+    }
+    .overlay-close {
+      font-family: 'Orbitron', monospace;
+      font-size: 13px;
+      letter-spacing: 3px;
+      color: var(--dark);
+      background: var(--red);
+      border: none;
+      padding: 16px 40px;
+      cursor: pointer;
+      clip-path: polygon(10px 0%, 100% 0%, calc(100% - 10px) 100%, 0% 100%);
+    }
+
+    /* ===== MAIN LAYOUT ===== */
+    .page {
+      max-width: 500px;
+      margin: 0 auto;
+      padding: 0 0 120px;
+    }
+
+    /* ===== TOP BAR ===== */
+    .top-bar {
+      background: rgba(0,0,0,0.6);
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      padding: 12px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      backdrop-filter: blur(10px);
+    }
+
+    .top-bar-logo {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 22px;
+      letter-spacing: 2px;
+      color: var(--red);
+    }
+
+    .top-bar-round {
+      font-family: 'Orbitron', monospace;
+      font-size: 10px;
+      letter-spacing: 2px;
+      color: rgba(255,255,255,0.5);
+      text-align: right;
+    }
+
+    .top-bar-round strong {
+      color: var(--gold);
+      font-size: 13px;
+      display: block;
+    }
+
+    /* ===== PLAYER HEADER ===== */
+    .player-header {
+      padding: 30px 20px 20px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .player-header::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at top left, var(--pc-alpha), transparent 60%);
+    }
+
+    .player-header-inner { position: relative; }
+
+    .player-label {
+      font-size: 10px;
+      letter-spacing: 4px;
+      color: rgba(255,255,255,0.4);
+      margin-bottom: 4px;
+    }
+
+    .player-name-display {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 64px;
+      line-height: 1;
+      letter-spacing: 2px;
+      color: var(--pc);
+    }
+
+    .total-points-row {
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+      margin-top: 8px;
+    }
+
+    .total-pts-num {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 52px;
+      line-height: 1;
+      color: var(--gold);
+    }
+
+    .total-pts-label {
+      font-size: 11px;
+      letter-spacing: 3px;
+      color: rgba(255,255,255,0.4);
+    }
+
+    .current-rank {
+      font-size: 11px;
+      letter-spacing: 2px;
+      color: rgba(255,255,255,0.5);
+      margin-top: 6px;
+    }
+
+    .current-rank span {
+      color: var(--pc);
+      font-weight: bold;
+    }
+
+    /* ===== SECTION HEADERS ===== */
+    .section-header {
+      padding: 20px 20px 10px;
+      font-family: 'Orbitron', monospace;
+      font-size: 10px;
+      letter-spacing: 4px;
+      color: rgba(255,255,255,0.3);
+      text-transform: uppercase;
+      border-top: 1px solid rgba(255,255,255,0.06);
+      margin-top: 10px;
+    }
+
+    /* ===== LEADERBOARD ===== */
+    .leaderboard {
+      padding: 0 20px;
+    }
+
+    .lb-row {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 12px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .lb-rank {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 28px;
+      width: 30px;
+      text-align: center;
+      color: rgba(255,255,255,0.2);
+    }
+
+    .lb-rank.rank-1 { color: var(--gold); }
+    .lb-rank.rank-2 { color: #c0c0c0; }
+    .lb-rank.rank-3 { color: #cd7f32; }
+
+    .lb-name {
+      flex: 1;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 26px;
+      letter-spacing: 1px;
+    }
+
+    .lb-pts {
+      font-family: 'Orbitron', monospace;
+      font-size: 16px;
+      font-weight: 700;
+    }
+
+    .lb-bar-wrap {
+      width: 80px;
+      height: 3px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .lb-bar {
+      height: 100%;
+      background: linear-gradient(90deg, var(--pc), var(--gold));
+      border-radius: 2px;
+      transition: width 0.5s;
+    }
+
+    .lb-crown {
+      font-size: 14px;
+    }
+
+    /* ===== SCORECARD ===== */
+    .scorecard {
+      padding: 0 20px;
+    }
+
+    .round-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .round-num {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 18px;
+      color: rgba(255,255,255,0.2);
+      width: 20px;
+    }
+
+    .round-name {
+      flex: 1;
+      font-size: 13px;
+      letter-spacing: 0.5px;
+      color: rgba(255,255,255,0.7);
+    }
+
+    .round-name.current {
+      color: var(--gold);
+    }
+
+    .round-name.current::before {
+      content: '▸ ';
+      color: var(--red);
+    }
+
+    .place-selector {
+      display: flex;
+      gap: 6px;
+    }
+
+    .place-btn {
+      width: 34px;
+      height: 34px;
+      border: 1px solid rgba(255,255,255,0.15);
+      background: transparent;
+      color: rgba(255,255,255,0.4);
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 18px;
+      cursor: pointer;
+      transition: all 0.2s;
+      clip-path: polygon(4px 0%, 100% 0%, calc(100% - 4px) 100%, 0% 100%);
+    }
+
+    .place-btn:hover {
+      border-color: var(--pc);
+      color: var(--pc);
+      background: rgba(0,207,255,0.1);
+    }
+
+    .place-btn.selected {
+      background: var(--pc);
+      border-color: var(--pc);
+      color: var(--dark);
+    }
+
+    .place-btn:disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
+    }
+
+    .round-score {
+      font-family: 'Orbitron', monospace;
+      font-size: 14px;
+      font-weight: 700;
+      width: 30px;
+      text-align: center;
+      color: var(--gold);
+    }
+
+    .round-locked {
+      font-size: 11px;
+      color: rgba(255,255,255,0.2);
+      letter-spacing: 1px;
+    }
+
+    /* ===== SABOTAGE SECTION ===== */
+    .sabotages-section {
+      padding: 0 20px 20px;
+    }
+
+    .sabotage-unlocked-banner {
+      background: rgba(255,215,0,0.1);
+      border: 1px solid rgba(255,215,0,0.3);
+      padding: 14px 16px;
+      margin-bottom: 16px;
+      font-size: 12px;
+      color: var(--gold);
+      letter-spacing: 1px;
+      display: none;
+    }
+
+    .sabotage-unlocked-banner.show { display: block; }
+
+    .sabotage-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .sabotage-card {
+      border: 1px solid rgba(255,255,255,0.1);
+      padding: 16px 14px;
+      cursor: pointer;
+      transition: all 0.3s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .sabotage-card.locked {
+      opacity: 0.3;
+      cursor: not-allowed;
+    }
+
+    .sabotage-card.available {
+      border-color: rgba(255,215,0,0.4);
+      animation: sabotage-pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes sabotage-pulse {
+      0%, 100% { box-shadow: 0 0 0 transparent; }
+      50% { box-shadow: 0 0 15px rgba(255,215,0,0.2); }
+    }
+
+    .sabotage-card.used {
+      opacity: 0.2;
+      cursor: not-allowed;
+    }
+
+    .sabotage-icon {
+      font-size: 28px;
+      margin-bottom: 8px;
+      display: block;
+    }
+
+    .sabotage-name {
+      font-family: 'Orbitron', monospace;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      margin-bottom: 4px;
+    }
+
+    .sabotage-desc {
+      font-size: 9px;
+      color: rgba(255,255,255,0.4);
+      line-height: 1.5;
+      letter-spacing: 0.5px;
+    }
+
+    .sabotage-status {
+      font-size: 8px;
+      letter-spacing: 2px;
+      color: rgba(255,255,255,0.25);
+      margin-top: 8px;
+    }
+
+    .sabotage-card.available .sabotage-status {
+      color: var(--gold);
+    }
+
+    /* ===== TARGET MODAL ===== */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.9);
+      z-index: 500;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .modal-overlay.active { display: flex; }
+
+    .modal {
+      background: #0a0a1a;
+      border: 1px solid rgba(255,215,0,0.3);
+      padding: 30px;
+      max-width: 360px;
+      width: 100%;
+      position: relative;
+    }
+
+    .modal-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 36px;
+      letter-spacing: 2px;
+      color: var(--gold);
+      margin-bottom: 6px;
+    }
+
+    .modal-sabotage {
+      font-size: 11px;
+      letter-spacing: 2px;
+      color: rgba(255,255,255,0.5);
+      margin-bottom: 24px;
+    }
+
+    .modal-sub {
+      font-size: 12px;
+      color: rgba(255,255,255,0.6);
+      margin-bottom: 20px;
+    }
+
+    .target-options {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+
+    .target-btn {
+      padding: 14px 20px;
+      border: 1px solid rgba(255,255,255,0.15);
+      background: transparent;
+      color: #fff;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 22px;
+      letter-spacing: 2px;
+      cursor: pointer;
+      text-align: left;
+      transition: all 0.2s;
+      clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%);
+    }
+
+    .target-btn:hover {
+      border-color: var(--red);
+      color: var(--red);
+      background: rgba(255,26,26,0.1);
+    }
+
+    .modal-cancel {
+      font-size: 10px;
+      letter-spacing: 3px;
+      color: rgba(255,255,255,0.25);
+      background: none;
+      border: none;
+      cursor: pointer;
+      width: 100%;
+      padding: 10px;
+    }
+
+    .modal-cancel:hover { color: rgba(255,255,255,0.6); }
+
+    /* ===== PENALTIES ===== */
+    .penalties-section {
+      padding: 0 20px 20px;
+    }
+
+    .penalty-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .penalty-icon { font-size: 20px; width: 28px; text-align: center; }
+
+    .penalty-name {
+      flex: 1;
+      font-size: 12px;
+      color: rgba(255,255,255,0.6);
+      letter-spacing: 0.5px;
+    }
+
+    .penalty-pts {
+      font-family: 'Orbitron', monospace;
+      font-size: 12px;
+      color: var(--red);
+      font-weight: 700;
+    }
+
+    .penalty-apply {
+      width: 30px;
+      height: 30px;
+      border: 1px solid rgba(255,26,26,0.4);
+      background: transparent;
+      color: var(--red);
+      font-size: 18px;
+      cursor: pointer;
+      transition: all 0.2s;
+      clip-path: polygon(4px 0%, 100% 0%, calc(100% - 4px) 100%, 0% 100%);
+    }
+
+    .penalty-apply:hover {
+      background: rgba(255,26,26,0.2);
+      border-color: var(--red);
+    }
+
+    /* ===== INCOMING SABOTAGE ===== */
+    .incoming-alert {
+      margin: 0 20px 10px;
+      background: rgba(255,26,26,0.1);
+      border: 1px solid rgba(255,26,26,0.4);
+      padding: 14px 16px;
+      display: none;
+      animation: alert-glow 1.5s ease-in-out infinite;
+    }
+
+    .incoming-alert.show { display: block; }
+
+    @keyframes alert-glow {
+      0%, 100% { box-shadow: none; }
+      50% { box-shadow: 0 0 20px rgba(255,26,26,0.3); }
+    }
+
+    .incoming-alert-title {
+      font-family: 'Orbitron', monospace;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--red);
+      letter-spacing: 2px;
+      margin-bottom: 6px;
+    }
+
+    .incoming-alert-body {
+      font-size: 12px;
+      color: rgba(255,255,255,0.7);
+      line-height: 1.6;
+    }
+
+    /* ===== DANNY ADMIN SECTION ===== */
+    .admin-section {
+      display: none;
+      margin: 0 20px 20px;
+      border: 1px solid rgba(204,68,255,0.4);
+      padding: 24px;
+      position: relative;
+    }
+
+    .admin-section.danny-only { display: block; }
+
+    .admin-section::before {
+      content: '⚙ COMMISSIONER';
+      position: absolute;
+      top: -10px;
+      left: 16px;
+      font-family: 'Orbitron', monospace;
+      font-size: 9px;
+      letter-spacing: 3px;
+      color: #cc44ff;
+      background: var(--dark);
+      padding: 0 8px;
+    }
+
+    .admin-round-display {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .admin-round-big {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 72px;
+      line-height: 1;
+      color: #cc44ff;
+    }
+
+    .admin-round-name {
+      font-size: 13px;
+      color: rgba(255,255,255,0.5);
+      letter-spacing: 1px;
+      margin-bottom: 16px;
+    }
+
+    .admin-round-btns {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+
+    .admin-round-btn {
+      font-family: 'Orbitron', monospace;
+      font-size: 10px;
+      letter-spacing: 2px;
+      padding: 10px 20px;
+      border: 1px solid;
+      background: transparent;
+      cursor: pointer;
+      transition: all 0.2s;
+      clip-path: polygon(6px 0%, 100% 0%, calc(100% - 6px) 100%, 0% 100%);
+    }
+
+    .admin-round-btn.prev {
+      border-color: rgba(255,255,255,0.2);
+      color: rgba(255,255,255,0.4);
+    }
+
+    .admin-round-btn.prev:hover {
+      border-color: rgba(255,255,255,0.5);
+      color: #fff;
+    }
+
+    .admin-round-btn.next {
+      border-color: #cc44ff;
+      color: #cc44ff;
+    }
+
+    .admin-round-btn.next:hover {
+      background: rgba(204,68,255,0.15);
+      box-shadow: 0 0 20px rgba(204,68,255,0.3);
+    }
+
+    .admin-divider {
+      border: none;
+      border-top: 1px solid rgba(255,255,255,0.06);
+      margin: 16px 0;
+    }
+
+    .admin-penalty-sub {
+      font-family: 'Orbitron', monospace;
+      font-size: 9px;
+      letter-spacing: 3px;
+      color: rgba(255,255,255,0.25);
+      margin-bottom: 12px;
+    }
+
+    .admin-penalty-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+    }
+
+    .admin-penalty-label {
+      flex: 1;
+      font-size: 11px;
+      color: rgba(255,255,255,0.5);
+      letter-spacing: 0.5px;
+    }
+
+    .admin-player-btns {
+      display: flex;
+      gap: 5px;
+    }
+
+    .admin-pp-btn {
+      font-size: 9px;
+      letter-spacing: 1px;
+      padding: 5px 9px;
+      border: 1px solid rgba(255,26,26,0.3);
+      background: transparent;
+      color: rgba(255,26,26,0.7);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .admin-pp-btn:hover {
+      background: rgba(255,26,26,0.15);
+      border-color: var(--red);
+      color: var(--red);
+    }
+
+    .admin-reset-btn {
+      font-family: 'Orbitron', monospace;
+      font-size: 10px;
+      letter-spacing: 2px;
+      padding: 10px;
+      border: 1px solid rgba(255,26,26,0.4);
+      background: transparent;
+      color: rgba(255,26,26,0.6);
+      cursor: pointer;
+      width: 100%;
+      margin-top: 16px;
+      transition: all 0.2s;
+    }
+
+    .admin-reset-btn:hover {
+      background: rgba(255,26,26,0.1);
+      border-color: var(--red);
+      color: var(--red);
+    }
+
+    /* Nav back */
+    .back-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: rgba(5,5,15,0.95);
+      border-top: 1px solid rgba(255,255,255,0.08);
+      padding: 12px 20px;
+      display: flex;
+      justify-content: center;
+      z-index: 200;
+      backdrop-filter: blur(10px);
+    }
+
+    .back-link {
+      font-family: 'Orbitron', monospace;
+      font-size: 10px;
+      letter-spacing: 3px;
+      color: rgba(255,255,255,0.3);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .back-link:hover { color: var(--red); }
+
+    /* Toast notification */
+    .toast {
+      position: fixed;
+      top: 80px;
+      left: 50%;
+      transform: translateX(-50%) translateY(-100px);
+      background: #0a0a1a;
+      border: 1px solid var(--gold);
+      padding: 14px 24px;
+      font-family: 'Orbitron', monospace;
+      font-size: 11px;
+      letter-spacing: 2px;
+      color: var(--gold);
+      z-index: 1000;
+      transition: transform 0.4s;
+      text-align: center;
+      max-width: 320px;
+    }
+
+    .toast.show { transform: translateX(-50%) translateY(0); }
+  </style>
+</head>
+<body>
+
+<!-- Sabotage incoming overlay -->
+<div class="sabotage-overlay" id="sabotageOverlay">
+  <div class="sabotage-alert-icon" id="overlayIcon">⚠️</div>
+  <div class="sabotage-alert-title">SABOTAGED!</div>
+  <div class="sabotage-alert-name" id="overlayName">—</div>
+  <div class="sabotage-alert-desc" id="overlayDesc">—</div>
+  <div class="sabotage-alert-from" id="overlayFrom">—</div>
+  <button class="overlay-close" onclick="closeOverlay()">// Got It. Let's Go. //</button>
+</div>
+
+<!-- Target selection modal -->
+<div class="modal-overlay" id="targetModal">
+  <div class="modal">
+    <div class="modal-title">Choose Target</div>
+    <div class="modal-sabotage" id="modalSabotageName">—</div>
+    <div class="modal-sub">Who do you want to hit with this sabotage next round?</div>
+    <div class="target-options" id="targetOptions"></div>
+    <button class="modal-cancel" onclick="closeModal()">[ cancel ]</button>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<!-- Main page -->
+<div class="top-bar">
+  <div class="top-bar-logo">LVL 30</div>
+  <div class="top-bar-round">
+    Round <strong id="topRoundNum">—</strong>
+    <span id="topRoundName" style="font-size:9px; color:rgba(255,255,255,0.35); display:block;">—</span>
+  </div>
+</div>
+
+<div class="page">
+
+  <div class="player-header">
+    <div style="position:absolute;inset:0;pointer-events:none;" id="headerBg"></div>
+    <div class="player-header-inner">
+      <div class="player-label">// Your Command Center</div>
+      <div class="player-name-display" id="playerNameDisplay">—</div>
+      <div class="total-points-row">
+        <div class="total-pts-num" id="totalPtsNum">0</div>
+        <div class="total-pts-label">PTS</div>
+      </div>
+      <div class="current-rank" id="currentRank">Current Rank: <span>—</span></div>
+    </div>
+  </div>
+
+  <!-- Incoming sabotage alert -->
+  <div class="incoming-alert" id="incomingAlert">
+    <div class="incoming-alert-title">⚠ INCOMING SABOTAGE</div>
+    <div class="incoming-alert-body" id="incomingAlertBody">—</div>
+  </div>
+
+  <!-- Leaderboard -->
+  <div class="section-header">// Live Standings</div>
+  <div class="leaderboard" id="leaderboard"></div>
+
+  <!-- Scorecard -->
+  <div class="section-header">// Round Scorecard</div>
+  <div class="scorecard" id="scorecard"></div>
+
+  <!-- Sabotages -->
+  <div class="section-header">// Sabotage Arsenal</div>
+  <div class="sabotages-section">
+    <div class="sabotage-unlocked-banner" id="sabotageUnlockedBanner">
+      🏆 You won this round! Choose a sabotage to deploy on another player next round.
+    </div>
+    <div class="sabotage-grid" id="sabotageGrid"></div>
+  </div>
+
+  <!-- Penalties (self-apply) -->
+  <div class="section-header">// Apply Penalty to Yourself</div>
+  <div class="penalties-section" id="penaltiesSection"></div>
+
+  <!-- DANNY ADMIN SECTION — only shown for Danny -->
+  <div class="section-header" id="adminSectionHeader" style="display:none; color:#cc44ff;">// Commissioner Controls</div>
+  <div class="admin-section" id="adminSection">
+    <div class="admin-round-display">
+      <div class="admin-round-big" id="adminRoundNum">—</div>
+      <div class="admin-round-name" id="adminRoundName">—</div>
+      <div class="admin-round-btns">
+        <button class="admin-round-btn prev" onclick="adminChangeRound(-1)">◂ Prev</button>
+        <button class="admin-round-btn next" onclick="adminChangeRound(1)">Next Round ▸</button>
+      </div>
+    </div>
+
+    <hr class="admin-divider">
+
+    <div class="admin-penalty-sub">// Apply Penalty to Any Player</div>
+    <div id="adminPenaltyControls"></div>
+
+    <button class="admin-reset-btn" onclick="adminReset()">⚠ RESET ENTIRE GAME</button>
+  </div>
+
+</div>
+
+<div class="back-bar">
+  <a href="select.html" class="back-link">◂ Back to Player Select</a>
+</div>
+
+<script src="js/config.js"></script>
+<script>
+  // ======= PLAYER COLORS =======
+  const PLAYER_COLORS = {
+    Carson: { main: '#00cfff', alpha: 'rgba(0,207,255,0.08)' },
+    Wyatt:  { main: '#ff6600', alpha: 'rgba(255,102,0,0.08)' },
+    Chris:  { main: '#00ff88', alpha: 'rgba(0,255,136,0.08)' },
+    Danny:  { main: '#cc44ff', alpha: 'rgba(204,68,255,0.08)' }
+  };
+
+  // ======= INIT =======
+  const params = new URLSearchParams(location.search);
+  const PLAYER = params.get('player');
+
+  if (!PLAYER || !CONFIG.PLAYERS.includes(PLAYER)) {
+    location.href = 'select.html';
+  }
+
+  const pc = PLAYER_COLORS[PLAYER];
+  document.documentElement.style.setProperty('--pc', pc.main);
+  document.documentElement.style.setProperty('--pc-alpha', pc.alpha);
+
+  document.getElementById('headerBg').style.cssText = `
+    background: radial-gradient(ellipse at top left, ${pc.alpha}, transparent 70%);
+    position: absolute; inset: 0; pointer-events: none;
+  `;
+
+  document.title = `Level 30 — ${PLAYER}`;
+  document.getElementById('playerNameDisplay').textContent = PLAYER;
+
+  let selectedSabotage = null;
+
+  // ======= LOAD & RENDER =======
+  function render() {
+    const state = getGameState();
+    const player = state.players[PLAYER];
+    const round = state.currentRound;
+
+    // Top bar
+    document.getElementById('topRoundNum').textContent = round;
+    document.getElementById('topRoundName').textContent = CONFIG.ROUNDS[round - 1] || 'Complete';
+
+    // Total points
+    document.getElementById('totalPtsNum').textContent = player.totalPoints;
+
+    // Rank
+    const ranking = getRanking(state);
+    const myRank = ranking.findIndex(r => r.name === PLAYER) + 1;
+    const rankLabels = ['', '1ST 🥇', '2ND 🥈', '3RD 🥉', '4TH'];
+    document.getElementById('currentRank').innerHTML = `Current Rank: <span>${rankLabels[myRank] || myRank}</span>`;
+
+    // Leaderboard
+    renderLeaderboard(state, ranking);
+
+    // Scorecard
+    renderScorecard(state, player, round);
+
+    // Sabotages
+    renderSabotages(state, player, round);
+
+    // Penalties
+    renderPenalties(state);
+
+    // Admin section (Danny only)
+    renderAdminSection(state);
+
+    // Incoming sabotage check
+    checkIncomingSabotage(state, round);
+  }
+
+  function renderLeaderboard(state, ranking) {
+    const lb = document.getElementById('leaderboard');
+    const maxPts = Math.max(...ranking.map(r => r.points)) || 1;
+
+    lb.innerHTML = ranking.map((r, i) => {
+      const isSelf = r.name === PLAYER;
+      const barWidth = Math.round((r.points / Math.max(maxPts, 1)) * 100);
+      const pc = PLAYER_COLORS[r.name];
+
+      return `
+        <div class="lb-row" style="${isSelf ? `background: rgba(255,255,255,0.02); margin: 0 -20px; padding: 12px 20px;` : ''}">
+          <div class="lb-rank rank-${i+1}">${i+1}</div>
+          <div class="lb-name" style="color:${isSelf ? pc.main : 'rgba(255,255,255,0.8)'}">
+            ${r.name}${isSelf ? ' ◂' : ''}
+          </div>
+          <div class="lb-bar-wrap">
+            <div class="lb-bar" style="width:${barWidth}%; background:${pc.main};"></div>
+          </div>
+          <div class="lb-pts" style="color:${pc.main}">${r.points}</div>
+          ${i === 0 && r.points > 0 ? '<div class="lb-crown">👑</div>' : '<div style="width:20px"></div>'}
+        </div>
+      `;
+    }).join('');
+  }
+
+  function renderScorecard(state, player, currentRound) {
+    const sc = document.getElementById('scorecard');
+
+    sc.innerHTML = CONFIG.ROUNDS.map((name, idx) => {
+      const rNum = idx + 1;
+      const isCurrent = rNum === currentRound;
+      const isPast = rNum < currentRound;
+      const isFuture = rNum > currentRound;
+      const score = player.scores[rNum];
+
+      let rightSide = '';
+
+      if (isFuture) {
+        rightSide = `<div class="round-locked">—</div>`;
+      } else if (isPast || score !== undefined) {
+        rightSide = `<div class="round-score">${score !== undefined ? score : '—'}</div>`;
+      } else {
+        // Current round - show place buttons
+        rightSide = `
+          <div class="place-selector">
+            ${[1,2,3,4].map(p => `
+              <button class="place-btn ${score === p ? 'selected' : ''}"
+                onclick="submitScore(${rNum}, ${p})"
+                ${isPast && score !== undefined ? 'disabled' : ''}>
+                ${p}
+              </button>
+            `).join('')}
+          </div>
+        `;
+      }
+
+      return `
+        <div class="round-item">
+          <div class="round-num">${rNum}</div>
+          <div class="round-name ${isCurrent ? 'current' : ''}">${name}</div>
+          ${rightSide}
+        </div>
+      `;
+    }).join('');
+  }
+
+  function renderSabotages(state, player, currentRound) {
+    const grid = document.getElementById('sabotageGrid');
+    const banner = document.getElementById('sabotageUnlockedBanner');
+
+    // Did this player win this round? (score = 1)
+    const wonThisRound = player.scores[currentRound] === 1;
+    const hasUnlocked = player.unlockedSabotage !== null;
+
+    banner.classList.toggle('show', wonThisRound && !hasUnlocked);
+
+    grid.innerHTML = CONFIG.SABOTAGES.map(s => {
+      const isUsed = state.usedSabotages.some(u => u.from === PLAYER && u.sabotageId === s.id);
+      const isAvailable = wonThisRound && !hasUnlocked;
+      const isUnlocked = player.unlockedSabotage === s.id;
+
+      let statusClass = 'locked';
+      let statusText = 'LOCKED';
+
+      if (isUsed) { statusClass = 'used'; statusText = 'USED'; }
+      else if (isUnlocked) { statusClass = 'available'; statusText = '▸ READY TO DEPLOY'; }
+      else if (isAvailable) { statusClass = 'available'; statusText = '▸ UNLOCK THIS'; }
+
+      return `
+        <div class="sabotage-card ${statusClass}" onclick="handleSabotage('${s.id}', '${statusClass}', '${isUnlocked ? 'deploy' : 'unlock'}')">
+          <span class="sabotage-icon">${s.icon}</span>
+          <div class="sabotage-name" style="color:${s.color}">${s.name}</div>
+          <div class="sabotage-desc">${s.description}</div>
+          <div class="sabotage-status">${statusText}</div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  function renderPenalties(state) {
+    const section = document.getElementById('penaltiesSection');
+
+    section.innerHTML = CONFIG.PENALTIES.map(p => `
+      <div class="penalty-row">
+        <div class="penalty-icon">${p.icon}</div>
+        <div class="penalty-name">${p.name}</div>
+        <div class="penalty-pts">+${p.points} pts</div>
+        <button class="penalty-apply" onclick="applyPenalty('${p.id}', ${p.points})" title="Apply to ${PLAYER}">+</button>
+      </div>
+    `).join('');
+  }
+
+  function checkIncomingSabotage(state, currentRound) {
+    const incoming = state.sabotageQueue.find(
+      s => s.to === PLAYER && s.round === currentRound
+    );
+
+    const alert = document.getElementById('incomingAlert');
+    const body = document.getElementById('incomingAlertBody');
+
+    if (incoming) {
+      const sabotage = CONFIG.SABOTAGES.find(s => s.id === incoming.sabotageId);
+      if (sabotage) {
+        alert.classList.add('show');
+        body.innerHTML = `<strong>${incoming.from}</strong> hit you with <strong style="color:${sabotage.color}">${sabotage.name}</strong>!<br>${sabotage.description}`;
+      }
+    } else {
+      alert.classList.remove('show');
+    }
+  }
+
+  // ======= ACTIONS =======
+  function submitScore(round, placement) {
+    const state = getGameState();
+    const player = state.players[PLAYER];
+
+    if (player.scores[round] !== undefined) {
+      showToast('Score already logged for this round!');
+      return;
+    }
+
+    player.scores[round] = placement;
+
+    // Recalculate total
+    player.totalPoints = Object.values(player.scores).reduce((a, b) => a + b, 0);
+
+    // Apply penalties
+    const myPenalties = state.penalties.filter(p => p.playerId === PLAYER);
+    const penaltyTotal = myPenalties.reduce((a, p) => a + p.points, 0);
+    player.totalPoints += penaltyTotal;
+
+    saveGameState(state);
+    syncScore(PLAYER, round, placement, player.totalPoints); // 🔴 live sheet sync
+    showToast(`Round ${round} score logged: ${placement}${['st','nd','rd','th'][placement-1]} place`);
+    render();
+  }
+
+  function handleSabotage(sabotageId, statusClass, action) {
+    if (statusClass === 'locked' || statusClass === 'used') return;
+
+    const state = getGameState();
+    const player = state.players[PLAYER];
+
+    if (action === 'unlock') {
+      // Unlock this sabotage
+      player.unlockedSabotage = sabotageId;
+      saveGameState(state);
+      showToast('Sabotage unlocked! Now choose your target.');
+      render();
+    } else if (action === 'deploy') {
+      // Show target modal
+      selectedSabotage = sabotageId;
+      openTargetModal(sabotageId);
+    }
+  }
+
+  function openTargetModal(sabotageId) {
+    const sabotage = CONFIG.SABOTAGES.find(s => s.id === sabotageId);
+    document.getElementById('modalSabotageName').textContent = sabotage ? `${sabotage.icon} ${sabotage.name}` : '';
+
+    const options = document.getElementById('targetOptions');
+    options.innerHTML = CONFIG.PLAYERS
+      .filter(p => p !== PLAYER)
+      .map(p => `
+        <button class="target-btn" onclick="deployOn('${p}')">
+          ${p}
+        </button>
+      `).join('');
+
+    document.getElementById('targetModal').classList.add('active');
+  }
+
+  function closeModal() {
+    document.getElementById('targetModal').classList.remove('active');
+    selectedSabotage = null;
+  }
+
+  function deployOn(targetPlayer) {
+    if (!selectedSabotage) return;
+
+    const state = getGameState();
+    const nextRound = state.currentRound + 1;
+
+    state.sabotageQueue.push({
+      from: PLAYER,
+      to: targetPlayer,
+      sabotageId: selectedSabotage,
+      round: nextRound,
+      shown: false
+    });
+
+    state.usedSabotages.push({
+      from: PLAYER,
+      sabotageId: selectedSabotage,
+      round: state.currentRound
+    });
+
+    state.players[PLAYER].unlockedSabotage = null;
+
+    saveGameState(state);
+    closeModal();
+
+    const sabotage = CONFIG.SABOTAGES.find(s => s.id === selectedSabotage);
+    syncSabotage(PLAYER, targetPlayer, sabotage.name); // 🔴 live sheet sync
+    showToast(`☠ ${sabotage.name} deployed on ${targetPlayer} next round!`);
+    render();
+  }
+
+  function applyPenalty(penaltyId, points) {
+    const state = getGameState();
+    const penalty = CONFIG.PENALTIES.find(p => p.id === penaltyId);
+
+    state.penalties.push({
+      playerId: PLAYER,
+      penaltyId,
+      points,
+      round: state.currentRound
+    });
+
+    // Recalculate total
+    const player = state.players[PLAYER];
+    const scoreTotal = Object.values(player.scores).reduce((a, b) => a + b, 0);
+    const penaltyTotal = state.penalties
+      .filter(p => p.playerId === PLAYER)
+      .reduce((a, p) => a + p.points, 0);
+    player.totalPoints = scoreTotal + penaltyTotal;
+
+    saveGameState(state);
+    syncPenalty(PLAYER, penalty.name, points); // 🔴 live sheet sync
+    showToast(`⚠ Penalty applied: +${points} pts for ${penalty.name}`);
+    render();
+  }
+
+  function closeOverlay() {
+    document.getElementById('sabotageOverlay').classList.remove('active');
+
+    // Mark as shown
+    const state = getGameState();
+    state.sabotageQueue.forEach(s => {
+      if (s.to === PLAYER && s.round === state.currentRound) s.shown = true;
+    });
+    saveGameState(state);
+  }
+
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 3000);
+  }
+
+  // Check for unshown sabotage overlay on load
+  function checkOverlay() {
+    const state = getGameState();
+    const round = state.currentRound;
+    const unshown = state.sabotageQueue.find(
+      s => s.to === PLAYER && s.round === round && !s.shown
+    );
+
+    if (unshown) {
+      const sabotage = CONFIG.SABOTAGES.find(s => s.id === unshown.sabotageId);
+      if (sabotage) {
+        document.getElementById('overlayIcon').textContent = sabotage.icon;
+        document.getElementById('overlayName').textContent = sabotage.name;
+        document.getElementById('overlayDesc').textContent = sabotage.description;
+        document.getElementById('overlayFrom').textContent = `Deployed by: ${unshown.from}`;
+        document.getElementById('sabotageOverlay').classList.add('active');
+      }
+    }
+  }
+
+  // ======= AUTO REFRESH =======
+  render();
+  checkOverlay();
+
+  // Show admin section only for Danny
+  if (PLAYER === 'Danny') {
+    document.getElementById('adminSection').classList.add('danny-only');
+    document.getElementById('adminSectionHeader').style.display = 'block';
+  }
+
+  // Poll sheet every 5s — syncs all phones live
+  startPolling(() => {
+    render();
+    checkOverlay();
+  });
+
+  // ======= DANNY ADMIN FUNCTIONS =======
+  function renderAdminSection(state) {
+    if (PLAYER !== 'Danny') return;
+
+    document.getElementById('adminRoundNum').textContent = state.currentRound;
+    document.getElementById('adminRoundName').textContent = CONFIG.ROUNDS[state.currentRound - 1] || 'Complete!';
+
+    const el = document.getElementById('adminPenaltyControls');
+    el.innerHTML = CONFIG.PENALTIES.map(p => `
+      <div class="admin-penalty-row">
+        <div class="admin-penalty-label">${p.icon} ${p.name} <span style="color:var(--red)">+${p.points}</span></div>
+        <div class="admin-player-btns">
+          ${CONFIG.PLAYERS.map(name => `
+            <button class="admin-pp-btn" onclick="adminApplyPenalty('${name}', '${p.id}', ${p.points})">${name.substring(0,3)}</button>
+          `).join('')}
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function adminChangeRound(dir) {
+    const state = getGameState();
+    const newRound = state.currentRound + dir;
+    if (newRound < 1 || newRound > CONFIG.ROUNDS.length) {
+      showToast('No more rounds!');
+      return;
+    }
+    state.currentRound = newRound;
+    saveGameState(state);
+    syncRound(newRound); // 🔴 live sheet sync
+    showToast(`Round advanced to ${newRound}: ${CONFIG.ROUNDS[newRound - 1]}`);
+    render();
+  }
+
+  function adminApplyPenalty(playerName, penaltyId, points) {
+    const penalty = CONFIG.PENALTIES.find(p => p.id === penaltyId);
+    if (!confirm(`Apply +${points} pts to ${playerName} for "${penalty.name}"?`)) return;
+
+    const state = getGameState();
+    state.penalties.push({ playerId: playerName, penaltyId, points, round: state.currentRound });
+
+    const player = state.players[playerName];
+    const scoreTotal = Object.values(player.scores).reduce((a, b) => a + b, 0);
+    const penaltyTotal = state.penalties.filter(p => p.playerId === playerName).reduce((a, p) => a + p.points, 0);
+    player.totalPoints = scoreTotal + penaltyTotal;
+
+    saveGameState(state);
+    syncPenalty(playerName, penalty.name, points); // 🔴 live sheet sync
+    showToast(`☠ +${points} applied to ${playerName} — ${penalty.name}`);
+    render();
+  }
+
+  function adminReset() {
+    if (!confirm('RESET everything? All scores, sabotages, penalties wiped.')) return;
+    if (!confirm('FINAL CONFIRMATION — are you sure?')) return;
+    saveGameState(initGameState());
+    showToast('Game reset. Round 1 begins!');
+    render();
+  }
+</script>
+</body>
+</html>

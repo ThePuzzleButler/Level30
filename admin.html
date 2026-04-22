@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Level 30 — Admin Panel</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --red: #ff1a1a;
+      --gold: #ffd700;
+      --dark: #05050f;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: var(--dark);
+      color: #fff;
+      font-family: 'Share Tech Mono', monospace;
+      min-height: 100vh;
+      padding-bottom: 60px;
+    }
+
+    .top-bar {
+      background: rgba(0,0,0,0.8);
+      border-bottom: 1px solid rgba(255,215,0,0.2);
+      padding: 14px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .top-bar-title {
+      font-family: 'Orbitron', monospace;
+      font-size: 14px;
+      font-weight: 900;
+      letter-spacing: 3px;
+      color: var(--gold);
+    }
+
+    .top-bar-back {
+      font-size: 10px;
+      letter-spacing: 2px;
+      color: rgba(255,255,255,0.4);
+      text-decoration: none;
+    }
+
+    .page { max-width: 600px; margin: 0 auto; padding: 30px 20px; }
+
+    .section {
+      margin-bottom: 30px;
+      border: 1px solid rgba(255,255,255,0.08);
+      padding: 24px;
+    }
+
+    .section-title {
+      font-family: 'Orbitron', monospace;
+      font-size: 11px;
+      letter-spacing: 4px;
+      color: var(--gold);
+      margin-bottom: 20px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid rgba(255,215,0,0.2);
+    }
+
+    /* Current round display */
+    .round-display {
+      text-align: center;
+      padding: 20px 0;
+    }
+
+    .round-num-big {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 100px;
+      line-height: 1;
+      color: var(--red);
+    }
+
+    .round-name-big {
+      font-size: 18px;
+      color: rgba(255,255,255,0.7);
+      margin-bottom: 20px;
+    }
+
+    .round-controls {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+    }
+
+    .ctrl-btn {
+      font-family: 'Orbitron', monospace;
+      font-size: 11px;
+      letter-spacing: 2px;
+      padding: 12px 24px;
+      border: 1px solid;
+      background: transparent;
+      cursor: pointer;
+      transition: all 0.2s;
+      clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%);
+    }
+
+    .ctrl-btn.prev {
+      border-color: rgba(255,255,255,0.2);
+      color: rgba(255,255,255,0.4);
+    }
+
+    .ctrl-btn.prev:hover {
+      border-color: rgba(255,255,255,0.5);
+      color: #fff;
+    }
+
+    .ctrl-btn.next {
+      border-color: var(--gold);
+      color: var(--gold);
+    }
+
+    .ctrl-btn.next:hover {
+      background: rgba(255,215,0,0.15);
+      box-shadow: 0 0 20px rgba(255,215,0,0.2);
+    }
+
+    /* Full scoreboard */
+    .score-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .score-table th {
+      font-size: 9px;
+      letter-spacing: 2px;
+      color: rgba(255,255,255,0.3);
+      text-align: center;
+      padding: 8px 4px;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .score-table th:first-child { text-align: left; }
+
+    .score-table td {
+      text-align: center;
+      padding: 10px 4px;
+      font-family: 'Orbitron', monospace;
+      font-size: 13px;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+      color: rgba(255,255,255,0.6);
+    }
+
+    .score-table td:first-child {
+      text-align: left;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 20px;
+      letter-spacing: 1px;
+      color: #fff;
+    }
+
+    .score-table td.total {
+      color: var(--gold);
+      font-weight: 700;
+    }
+
+    .score-table tr:hover td { background: rgba(255,255,255,0.02); }
+
+    /* Manual penalty controls */
+    .penalty-controls {
+      display: grid;
+      gap: 10px;
+    }
+
+    .penalty-row-admin {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .penalty-label {
+      flex: 1;
+      font-size: 12px;
+      color: rgba(255,255,255,0.6);
+    }
+
+    .player-penalty-btns {
+      display: flex;
+      gap: 6px;
+    }
+
+    .pp-btn {
+      font-size: 9px;
+      letter-spacing: 1px;
+      padding: 6px 10px;
+      border: 1px solid rgba(255,26,26,0.3);
+      background: transparent;
+      color: rgba(255,26,26,0.7);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .pp-btn:hover {
+      background: rgba(255,26,26,0.15);
+      border-color: var(--red);
+      color: var(--red);
+    }
+
+    /* Reset button */
+    .danger-zone {
+      border-color: rgba(255,26,26,0.3);
+    }
+
+    .danger-btn {
+      font-family: 'Orbitron', monospace;
+      font-size: 11px;
+      letter-spacing: 2px;
+      padding: 12px 24px;
+      border: 1px solid var(--red);
+      background: transparent;
+      color: var(--red);
+      cursor: pointer;
+      transition: all 0.2s;
+      display: block;
+      width: 100%;
+      margin-bottom: 10px;
+    }
+
+    .danger-btn:hover {
+      background: rgba(255,26,26,0.15);
+    }
+
+    /* Event log */
+    .event-log {
+      max-height: 200px;
+      overflow-y: auto;
+      font-size: 11px;
+      color: rgba(255,255,255,0.4);
+      line-height: 2;
+    }
+
+    .log-entry {
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+      padding: 4px 0;
+    }
+
+    .log-entry .time {
+      color: rgba(255,255,255,0.2);
+      margin-right: 8px;
+    }
+
+    /* Sabotage queue */
+    .sabotage-queue {
+      font-size: 12px;
+      line-height: 2;
+    }
+
+    .sq-item {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      padding: 8px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .sq-from { color: var(--red); }
+    .sq-to { color: var(--gold); }
+    .sq-sabotage { color: rgba(255,255,255,0.6); }
+    .sq-round { color: rgba(255,255,255,0.3); font-size: 10px; }
+  </style>
+</head>
+<body>
+
+<div class="top-bar">
+  <div class="top-bar-title">⚙ Admin Panel</div>
+  <a href="select.html" class="top-bar-back">◂ Player Select</a>
+</div>
+
+<div class="page">
+
+  <!-- Round Control -->
+  <div class="section">
+    <div class="section-title">// Round Control</div>
+    <div class="round-display">
+      <div class="round-num-big" id="adminRoundNum">—</div>
+      <div class="round-name-big" id="adminRoundName">—</div>
+      <div class="round-controls">
+        <button class="ctrl-btn prev" onclick="changeRound(-1)">◂ Prev Round</button>
+        <button class="ctrl-btn next" onclick="changeRound(1)">Next Round ▸</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Full Scoreboard -->
+  <div class="section">
+    <div class="section-title">// Full Scoreboard</div>
+    <div id="fullScoreboard"></div>
+  </div>
+
+  <!-- Sabotage Queue -->
+  <div class="section">
+    <div class="section-title">// Active Sabotages</div>
+    <div class="sabotage-queue" id="sabotageQueue"></div>
+  </div>
+
+  <!-- Penalty Application -->
+  <div class="section">
+    <div class="section-title">// Apply Penalties</div>
+    <div class="penalty-controls" id="penaltyControls"></div>
+  </div>
+
+  <!-- Reset -->
+  <div class="section danger-zone">
+    <div class="section-title" style="color:var(--red)">// Danger Zone</div>
+    <button class="danger-btn" onclick="resetGame()">⚠ RESET ENTIRE GAME</button>
+    <div style="font-size:10px; color:rgba(255,255,255,0.2); letter-spacing:1px;">This will wipe all scores, sabotages, and penalties.</div>
+  </div>
+
+</div>
+
+<script src="js/config.js"></script>
+<script>
+  function render() {
+    const state = getGameState();
+
+    // Round display
+    document.getElementById('adminRoundNum').textContent = state.currentRound;
+    document.getElementById('adminRoundName').textContent = CONFIG.ROUNDS[state.currentRound - 1] || 'Complete!';
+
+    // Full scoreboard
+    renderScoreboard(state);
+
+    // Sabotage queue
+    renderSabotageQueue(state);
+
+    // Penalties
+    renderPenaltyControls(state);
+  }
+
+  function renderScoreboard(state) {
+    const container = document.getElementById('fullScoreboard');
+    const rounds = CONFIG.ROUNDS;
+
+    let html = `<table class="score-table">
+      <thead><tr>
+        <th>Player</th>
+        ${rounds.map((r, i) => `<th>${i+1}</th>`).join('')}
+        <th>Total</th>
+      </tr></thead>
+      <tbody>`;
+
+    const ranking = getRanking(state);
+
+    ranking.forEach(({ name }) => {
+      const p = state.players[name];
+      html += `<tr>
+        <td>${name}</td>
+        ${rounds.map((_, i) => {
+          const rNum = i + 1;
+          const score = p.scores[rNum];
+          return `<td>${score !== undefined ? score : '—'}</td>`;
+        }).join('')}
+        <td class="total">${p.totalPoints}</td>
+      </tr>`;
+    });
+
+    html += '</tbody></table>';
+    container.innerHTML = html;
+  }
+
+  function renderSabotageQueue(state) {
+    const el = document.getElementById('sabotageQueue');
+
+    if (state.sabotageQueue.length === 0) {
+      el.innerHTML = '<div style="color:rgba(255,255,255,0.25); font-size:11px; letter-spacing:2px;">No active sabotages</div>';
+      return;
+    }
+
+    el.innerHTML = state.sabotageQueue.map(s => {
+      const sabotage = CONFIG.SABOTAGES.find(sb => sb.id === s.sabotageId);
+      return `<div class="sq-item">
+        <span class="sq-from">${s.from}</span>
+        <span style="color:rgba(255,255,255,0.3)">→</span>
+        <span class="sq-to">${s.to}</span>
+        <span class="sq-sabotage">${sabotage ? sabotage.icon + ' ' + sabotage.name : s.sabotageId}</span>
+        <span class="sq-round">R${s.round} ${s.shown ? '✓' : '⏳'}</span>
+      </div>`;
+    }).join('');
+  }
+
+  function renderPenaltyControls(state) {
+    const el = document.getElementById('penaltyControls');
+
+    el.innerHTML = CONFIG.PENALTIES.map(penalty => `
+      <div class="penalty-row-admin">
+        <div class="penalty-label">${penalty.icon} ${penalty.name} (+${penalty.points})</div>
+        <div class="player-penalty-btns">
+          ${CONFIG.PLAYERS.map(p => `
+            <button class="pp-btn" onclick="adminApplyPenalty('${p}', '${penalty.id}', ${penalty.points})">
+              ${p.substring(0,3)}
+            </button>
+          `).join('')}
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function changeRound(dir) {
+    const state = getGameState();
+    const newRound = state.currentRound + dir;
+    if (newRound < 1 || newRound > CONFIG.ROUNDS.length) return;
+    state.currentRound = newRound;
+    saveGameState(state);
+    render();
+  }
+
+  function adminApplyPenalty(playerName, penaltyId, points) {
+    const state = getGameState();
+    const penalty = CONFIG.PENALTIES.find(p => p.id === penaltyId);
+
+    state.penalties.push({
+      playerId: playerName,
+      penaltyId,
+      points,
+      round: state.currentRound
+    });
+
+    // Recalc
+    const player = state.players[playerName];
+    const scoreTotal = Object.values(player.scores).reduce((a, b) => a + b, 0);
+    const penaltyTotal = state.penalties
+      .filter(p => p.playerId === playerName)
+      .reduce((a, p) => a + p.points, 0);
+    player.totalPoints = scoreTotal + penaltyTotal;
+
+    saveGameState(state);
+    render();
+
+    if (confirm(`Applied +${points} to ${playerName} for ${penalty.name}. Total now: ${player.totalPoints}`)) {}
+  }
+
+  function resetGame() {
+    if (confirm('Are you sure? This resets ALL scores, sabotages, and penalties.')) {
+      if (confirm('FINAL CONFIRMATION: Reset everything?')) {
+        const fresh = initGameState();
+        saveGameState(fresh);
+        render();
+        alert('Game has been reset. Round 1 begins!');
+      }
+    }
+  }
+
+  render();
+  setInterval(render, 5000);
+</script>
+</body>
+</html>

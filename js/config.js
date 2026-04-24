@@ -3,7 +3,7 @@
 // ============================================================
 
 const CONFIG = {
-  APPS_SCRIPT_URL: "https://script.google.com/macros/s/AKfycbzKQKl390M2sZvsp99qXJw9jhO3ciaL5j_e1jtxTFYR0wXF7TegG9SZ0O2uPwV5rQH_/exec",
+  APPS_SCRIPT_URL: "https://script.google.com/macros/s/AKfycbyMGgqDngAA4bVvXryioq7RrZbLTMScIPErVuSqRVfJtdGuSJXQxY1UIuO2MNniERNH/exec",
 
   PLAYERS: ["Carson", "Wyatt", "Chris", "Danny"],
 

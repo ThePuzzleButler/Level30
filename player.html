@@ -1333,11 +1333,27 @@
     render();
   }
 
-  function adminReset() {
+  async function adminReset() {
     if (!confirm('RESET everything? All scores, sabotages, penalties wiped.')) return;
     if (!confirm('FINAL CONFIRMATION — are you sure?')) return;
-    saveGameState(initGameState());
-    showToast('Game reset. Round 1 begins!');
+
+    showToast('Resetting... please wait');
+
+    try {
+      // Hit the sheet reset action — wipes O1 and all score cells
+      const res = await fetch(`${CONFIG.APPS_SCRIPT_URL}?action=reset&t=${Date.now()}`);
+      const freshState = await res.json();
+
+      // Write fresh state to localStorage from what sheet returned
+      localStorage.setItem("level30_state", JSON.stringify(freshState));
+      _lastRemoteHash = ""; // force poll to detect the change on all phones
+    } catch(e) {
+      // Fallback — reset locally if sheet unreachable
+      const freshState = initGameState();
+      localStorage.setItem("level30_state", JSON.stringify(freshState));
+    }
+
+    showToast('✅ Game reset! Round 1 begins!');
     render();
   }
 </script>

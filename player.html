@@ -840,7 +840,245 @@
     }
 
     .toast.show { transform: translateX(-50%) translateY(0); }
-  </style>
+  
+    /* ===== PUNISHMENT OVERLAY ===== */
+    .punishment-overlay {
+      position: fixed;
+      inset: 0;
+      background: #000;
+      z-index: 5000;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 30px;
+      overflow-y: auto;
+    }
+
+    .punishment-overlay.active { display: flex; }
+
+    .punishment-overlay::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: repeating-linear-gradient(
+        0deg, transparent, transparent 2px,
+        rgba(255,26,26,0.06) 2px, rgba(255,26,26,0.06) 4px
+      );
+      pointer-events: none;
+    }
+
+    .punishment-skull {
+      font-size: 80px;
+      margin-bottom: 10px;
+      animation: skull-shake 0.5s ease-in-out infinite;
+    }
+
+    @keyframes skull-shake {
+      0%, 100% { transform: rotate(-5deg); }
+      50% { transform: rotate(5deg); }
+    }
+
+    .punishment-eyebrow {
+      font-family: 'Orbitron', monospace;
+      font-size: 10px;
+      letter-spacing: 5px;
+      color: var(--red);
+      border: 1px solid var(--red);
+      padding: 6px 18px;
+      margin-bottom: 20px;
+      animation: pulse-border 1.5s ease-in-out infinite;
+    }
+
+    .punishment-loser-name {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(60px, 15vw, 100px);
+      line-height: 1;
+      color: var(--red);
+      filter: drop-shadow(0 0 30px rgba(255,26,26,0.7));
+      margin-bottom: 6px;
+    }
+
+    .punishment-subtitle {
+      font-family: 'Orbitron', monospace;
+      font-size: 13px;
+      letter-spacing: 3px;
+      color: rgba(255,255,255,0.5);
+      margin-bottom: 10px;
+    }
+
+    .punishment-tagline {
+      font-size: 14px;
+      color: rgba(255,255,255,0.4);
+      margin-bottom: 36px;
+      line-height: 1.8;
+    }
+
+    .punishment-instruction {
+      font-family: 'Orbitron', monospace;
+      font-size: 11px;
+      letter-spacing: 3px;
+      color: var(--gold);
+      margin-bottom: 20px;
+    }
+
+    .punishment-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      width: 100%;
+      max-width: 420px;
+      margin-bottom: 30px;
+    }
+
+    .punishment-option {
+      border: 1px solid rgba(255,26,26,0.3);
+      padding: 20px 24px;
+      cursor: pointer;
+      transition: all 0.3s;
+      text-align: left;
+      background: transparent;
+      position: relative;
+      overflow: hidden;
+      clip-path: polygon(10px 0%, 100% 0%, calc(100% - 10px) 100%, 0% 100%);
+    }
+
+    .punishment-option::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: rgba(255,26,26,0.05);
+      transform: translateX(-100%);
+      transition: transform 0.3s;
+    }
+
+    .punishment-option:hover::before { transform: translateX(0); }
+
+    .punishment-option:hover {
+      border-color: var(--red);
+      box-shadow: 0 0 20px rgba(255,26,26,0.2);
+    }
+
+    .punishment-option.selected {
+      border-color: var(--red);
+      background: rgba(255,26,26,0.1);
+      box-shadow: 0 0 30px rgba(255,26,26,0.3);
+    }
+
+    .punishment-num {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 32px;
+      color: rgba(255,26,26,0.3);
+      position: absolute;
+      top: 8px;
+      right: 16px;
+    }
+
+    .punishment-name {
+      font-family: 'Orbitron', monospace;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      color: #fff;
+      margin-bottom: 6px;
+    }
+
+    .punishment-desc {
+      font-size: 11px;
+      color: rgba(255,255,255,0.4);
+      letter-spacing: 0.5px;
+      line-height: 1.5;
+    }
+
+    .punishment-confirm {
+      font-family: 'Orbitron', monospace;
+      font-size: 13px;
+      letter-spacing: 3px;
+      color: var(--dark);
+      background: var(--red);
+      border: none;
+      padding: 18px 50px;
+      cursor: pointer;
+      display: none;
+      clip-path: polygon(10px 0%, 100% 0%, calc(100% - 10px) 100%, 0% 100%);
+      animation: pulse-border 1s ease-in-out infinite;
+      margin-bottom: 16px;
+    }
+
+    .punishment-confirm.show { display: block; }
+    .punishment-confirm:hover { box-shadow: 0 0 30px rgba(255,26,26,0.5); transform: scale(1.03); }
+
+    /* Final chosen punishment screen */
+    .punishment-chosen {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      padding: 20px;
+    }
+
+    .punishment-chosen.show { display: flex; }
+
+    .punishment-chosen-icon { font-size: 80px; margin-bottom: 20px; }
+
+    .punishment-chosen-label {
+      font-family: 'Orbitron', monospace;
+      font-size: 11px;
+      letter-spacing: 4px;
+      color: var(--red);
+      margin-bottom: 16px;
+    }
+
+    .punishment-chosen-name {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(36px, 8vw, 60px);
+      letter-spacing: 3px;
+      color: #fff;
+      margin-bottom: 16px;
+      line-height: 1.1;
+    }
+
+    .punishment-chosen-desc {
+      font-size: 14px;
+      color: rgba(255,255,255,0.6);
+      line-height: 1.8;
+      max-width: 360px;
+      margin-bottom: 30px;
+    }
+
+    .punishment-final-scores {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.1);
+      padding: 20px 30px;
+      width: 100%;
+      max-width: 380px;
+      margin-bottom: 30px;
+    }
+
+    .punishment-final-scores-title {
+      font-family: 'Orbitron', monospace;
+      font-size: 9px;
+      letter-spacing: 3px;
+      color: rgba(255,255,255,0.3);
+      margin-bottom: 14px;
+    }
+
+    .punishment-score-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      font-family: 'Orbitron', monospace;
+      font-size: 13px;
+    }
+
+    .punishment-score-row:last-child { border-bottom: none; }
+    .punishment-score-row.winner { color: var(--gold); }
+    .punishment-score-row.loser  { color: var(--red); }
+
+</style>
 </head>
 <body>
 
@@ -865,6 +1103,62 @@
   </div>
 </div>
 
+
+<!-- Punishment Overlay — fires after all 9 rounds -->
+<div class="punishment-overlay" id="punishmentOverlay">
+
+  <!-- Selection screen -->
+  <div id="punishmentSelect">
+    <div class="punishment-skull">💀</div>
+    <div class="punishment-eyebrow">⚠ GAME OVER ⚠</div>
+    <div class="punishment-loser-name" id="punishmentLoserName">—</div>
+    <div class="punishment-subtitle">FINISHED LAST</div>
+    <div class="punishment-tagline" id="punishmentTagline">The night is over.<br>Now it's time to pay.</div>
+    <div class="punishment-instruction">Choose your punishment:</div>
+
+    <div class="punishment-list">
+      <div class="punishment-option" onclick="selectPunishment(0)">
+        <div class="punishment-num">1</div>
+        <div class="punishment-name">⚡ Period Simulator</div>
+        <div class="punishment-desc">Level 7. No skipping. No mercy.</div>
+      </div>
+      <div class="punishment-option" onclick="selectPunishment(1)">
+        <div class="punishment-num">2</div>
+        <div class="punishment-name">🌊 Nudie Into the Ocean</div>
+        <div class="punishment-desc">Full send. Clothes stay on shore.</div>
+      </div>
+      <div class="punishment-option" onclick="selectPunishment(2)">
+        <div class="punishment-num">3</div>
+        <div class="punishment-name">🍺 Root Beer Mile</div>
+        <div class="punishment-desc">4 root beers. 4 laps. No stopping.</div>
+      </div>
+      <div class="punishment-option" onclick="selectPunishment(3)">
+        <div class="punishment-num">4</div>
+        <div class="punishment-name">🌶️ One Chip Challenge</div>
+        <div class="punishment-desc">One chip. All the pain. No water for 5 min.</div>
+      </div>
+    </div>
+
+    <button class="punishment-confirm" id="punishmentConfirm" onclick="confirmPunishment()">
+      // LOCK IT IN //
+    </button>
+  </div>
+
+  <!-- Chosen screen -->
+  <div class="punishment-chosen" id="punishmentChosen">
+    <div class="punishment-chosen-icon" id="chosenIcon">💀</div>
+    <div class="punishment-chosen-label">YOUR PUNISHMENT IS LOCKED</div>
+    <div class="punishment-chosen-name" id="chosenName">—</div>
+    <div class="punishment-chosen-desc" id="chosenDesc">—</div>
+
+    <div class="punishment-final-scores" id="finalScores"></div>
+
+    <div style="font-family:'Orbitron',monospace; font-size:10px; letter-spacing:3px; color:rgba(255,255,255,0.2);">
+      No Sleep. No Mercy. Level 30.
+    </div>
+  </div>
+
+</div>
 
 <!-- Bonus Challenge Overlay -->
 <div class="challenge-overlay" id="challengeOverlay">
@@ -1037,6 +1331,9 @@
 
     // Challenge strip
     renderChallengeStrip(state);
+
+    // Check if game is over
+    checkGameOver(state);
 
     // Incoming sabotage check
     checkIncomingSabotage(state, round);
@@ -1552,6 +1849,97 @@
     } else {
       items.innerHTML += `<div style="font-size:10px; color:rgba(255,255,255,0.2); letter-spacing:2px; padding-top:6px;">Max challenges reached</div>`;
     }
+  }
+
+
+  // ======= PUNISHMENT SYSTEM =======
+  const PUNISHMENTS = [
+    { icon: "⚡", name: "Period Simulator", desc: "Level 7. No skipping. No mercy. Feel every volt." },
+    { icon: "🌊", name: "Nudie Into the Ocean", desc: "Full send. Clothes stay on shore. Everyone watches." },
+    { icon: "🍺", name: "Root Beer Mile", desc: "4 root beers. 4 laps. You finish both or it doesn't count." },
+    { icon: "🌶️", name: "One Chip Challenge", desc: "One chip. All the pain. No water for 5 minutes. Good luck." }
+  ];
+
+  let selectedPunishmentIdx = null;
+
+  function checkGameOver(state) {
+    // All 9 rounds complete for all players
+    const allDone = CONFIG.PLAYERS.every(p => {
+      const scores = state.players[p].scores;
+      return Object.keys(scores).length === CONFIG.ROUNDS.length;
+    });
+
+    if (!allDone) return;
+
+    // Find loser (highest points = last place)
+    const ranking = getRanking(state);
+    const loser = ranking[ranking.length - 1]; // highest pts = last place
+
+    const overlay = document.getElementById('punishmentOverlay');
+    if (overlay.classList.contains('active')) return; // already showing
+
+    // Only show to the loser themselves OR show to everyone
+    document.getElementById('punishmentLoserName').textContent = loser.name;
+
+    const isLoser = PLAYER === loser.name;
+    if (isLoser) {
+      document.getElementById('punishmentTagline').innerHTML =
+        `The night is over, ${loser.name}.<br>Now it's time to pay.`;
+    } else {
+      document.getElementById('punishmentTagline').innerHTML =
+        `<strong style="color:var(--gold)">${loser.name}</strong> finished last.<br>Time to watch them suffer. 😈`;
+      // Non-losers see a read-only version
+      document.querySelectorAll('.punishment-option').forEach(el => el.style.pointerEvents = 'none');
+      document.getElementById('punishmentInstruction') && (document.getElementById('punishmentInstruction').textContent = 'They must choose their fate:');
+    }
+
+    overlay.classList.add('active');
+  }
+
+  function selectPunishment(idx) {
+    // Only loser can select
+    const state = getGameState();
+    const ranking = getRanking(state);
+    const loser = ranking[ranking.length - 1];
+    if (PLAYER !== loser.name) return;
+
+    selectedPunishmentIdx = idx;
+    document.querySelectorAll('.punishment-option').forEach((el, i) => {
+      el.classList.toggle('selected', i === idx);
+    });
+    document.getElementById('punishmentConfirm').classList.add('show');
+  }
+
+  function confirmPunishment() {
+    if (selectedPunishmentIdx === null) return;
+    const p = PUNISHMENTS[selectedPunishmentIdx];
+    const state = getGameState();
+    const ranking = getRanking(state);
+
+    // Show chosen screen
+    document.getElementById('punishmentSelect').style.display = 'none';
+    const chosen = document.getElementById('punishmentChosen');
+    chosen.classList.add('show');
+
+    document.getElementById('chosenIcon').textContent = p.icon;
+    document.getElementById('chosenName').textContent = p.name;
+    document.getElementById('chosenDesc').textContent = p.desc;
+
+    // Final scoreboard
+    const medals = ['🥇', '🥈', '🥉', '💀'];
+    document.getElementById('finalScores').innerHTML = `
+      <div class="punishment-final-scores-title">// FINAL STANDINGS</div>
+      ${ranking.map((r, i) => `
+        <div class="punishment-score-row ${i === 0 ? 'winner' : ''} ${i === ranking.length - 1 ? 'loser' : ''}">
+          <span>${medals[i]} ${r.name}</span>
+          <span>${r.points} pts</span>
+        </div>
+      `).join('')}
+    `;
+
+    // Save punishment choice to state
+    state.punishmentChosen = { player: PLAYER, punishment: p.name };
+    saveGameState(state);
   }
 
 </script>

@@ -813,10 +813,35 @@
 
   function scheduleChallenge() {
     const state = getGameState();
+    if (!state.players[PLAYER]) return;
     const received = state.players[PLAYER].challengesReceived || [];
     if (received.length >= MAX_CHALLENGES) return;
-    // Fire between 10 and 30 minutes randomly
-    const delay = (10 + Math.random() * 20) * 60 * 1000;
+
+    let delay;
+    if (PLAYER === 'Carson' || PLAYER === 'Wyatt') {
+      const alreadyGot = received.length;
+      // First challenge for Wyatt is always Pants Danny
+      if (PLAYER === 'Wyatt' && alreadyGot === 0) {
+        delay = (15 + Math.random() * 30) * 1000;
+        setTimeout(() => {
+          const s = getGameState();
+          if (!s.players[PLAYER].challengesReceived) s.players[PLAYER].challengesReceived = [];
+          if (s.players[PLAYER].challengesReceived.length >= MAX_CHALLENGES) return;
+          const idx = CHALLENGES.findIndex(c => c.text.includes('Pants Danny'));
+          if (idx === -1) { triggerChallenge(); return; }
+          activeChallengeIdx = idx;
+          document.getElementById('challengeText').textContent = CHALLENGES[idx].text;
+          document.getElementById('challengeOverlay').classList.add('active');
+        }, delay);
+        return;
+      }
+      if (alreadyGot === 0) delay = (15 + Math.random() * 30) * 1000;
+      else if (alreadyGot === 1) delay = (2 + Math.random() * 3) * 60 * 1000;
+      else delay = (5 + Math.random() * 5) * 60 * 1000;
+    } else {
+      // Normal timing for everyone else
+      delay = (10 + Math.random() * 20) * 60 * 1000;
+    }
     setTimeout(triggerChallenge, delay);
   }
 

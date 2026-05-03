@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Level 30 — Danny's Fate</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+  <style>
+    :root { --red: #ff1a1a; --gold: #ffd700; --dark: #05050f; }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: #000; color: #fff;
+      font-family: 'Share Tech Mono', monospace;
+      min-height: 100vh; display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      padding: 30px; text-align: center; overflow-y: auto;
+    }
+    body::before {
+      content: ''; position: fixed; inset: 0;
+      background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,26,26,0.06) 2px, rgba(255,26,26,0.06) 4px);
+      pointer-events: none;
+    }
+    .skull { font-size: 90px; margin-bottom: 12px; animation: shake 0.5s ease-in-out infinite; }
+    @keyframes shake { 0%,100%{transform:rotate(-6deg)} 50%{transform:rotate(6deg)} }
+    .eyebrow { font-family:'Orbitron',monospace; font-size:10px; letter-spacing:5px; color:var(--red); border:1px solid var(--red); padding:6px 18px; margin-bottom:20px; animation:glow 1.5s ease-in-out infinite; }
+    @keyframes glow { 0%,100%{box-shadow:none} 50%{box-shadow:0 0 20px rgba(255,26,26,0.5)} }
+    .loser-name { font-family:'Bebas Neue',sans-serif; font-size:clamp(80px,20vw,140px); line-height:1; color:var(--red); filter:drop-shadow(0 0 40px rgba(255,26,26,0.8)); margin-bottom:6px; animation:pulse 2s ease-in-out infinite; }
+    @keyframes pulse { 0%,100%{filter:drop-shadow(0 0 40px rgba(255,26,26,0.8))} 50%{filter:drop-shadow(0 0 80px rgba(255,26,26,1))} }
+    .subtitle { font-family:'Orbitron',monospace; font-size:13px; letter-spacing:3px; color:rgba(255,255,255,0.5); margin-bottom:10px; }
+    .tagline { font-size:15px; color:rgba(255,255,255,0.4); margin-bottom:36px; line-height:1.8; }
+    .instruction { font-family:'Orbitron',monospace; font-size:11px; letter-spacing:3px; color:var(--gold); margin-bottom:20px; }
+    .list { display:flex; flex-direction:column; gap:12px; width:100%; max-width:440px; margin-bottom:30px; }
+    .option {
+      border:1px solid rgba(255,26,26,0.3); padding:20px 24px; cursor:pointer;
+      transition:all 0.3s; text-align:left; background:transparent; position:relative;
+      clip-path:polygon(10px 0%,100% 0%,calc(100% - 10px) 100%,0% 100%);
+    }
+    .option:hover { border-color:var(--red); box-shadow:0 0 20px rgba(255,26,26,0.2); background:rgba(255,26,26,0.05); }
+    .option.selected { border-color:var(--red); background:rgba(255,26,26,0.12); box-shadow:0 0 30px rgba(255,26,26,0.3); }
+    .option-num { font-family:'Bebas Neue',sans-serif; font-size:32px; color:rgba(255,26,26,0.25); position:absolute; top:8px; right:16px; }
+    .option-name { font-family:'Orbitron',monospace; font-size:13px; font-weight:700; letter-spacing:1px; color:#fff; margin-bottom:6px; }
+    .option-desc { font-size:11px; color:rgba(255,255,255,0.4); line-height:1.6; }
+    .confirm-btn {
+      font-family:'Orbitron',monospace; font-size:13px; letter-spacing:3px;
+      color:#000; background:var(--red); border:none; padding:18px 50px;
+      cursor:pointer; display:none; margin-bottom:16px;
+      clip-path:polygon(10px 0%,100% 0%,calc(100% - 10px) 100%,0% 100%);
+    }
+    .confirm-btn.show { display:block; }
+    .confirm-btn:hover { box-shadow:0 0 30px rgba(255,26,26,0.6); transform:scale(1.03); }
+    .chosen { display:none; flex-direction:column; align-items:center; padding:20px; }
+    .chosen.show { display:flex; }
+    .chosen-icon { font-size:90px; margin-bottom:20px; }
+    .chosen-label { font-family:'Orbitron',monospace; font-size:11px; letter-spacing:4px; color:var(--red); margin-bottom:16px; }
+    .chosen-name { font-family:'Bebas Neue',sans-serif; font-size:clamp(40px,10vw,70px); letter-spacing:3px; color:#fff; margin-bottom:16px; line-height:1.1; }
+    .chosen-desc { font-size:15px; color:rgba(255,255,255,0.6); line-height:1.8; max-width:380px; margin-bottom:30px; }
+    .sign-off { font-family:'Orbitron',monospace; font-size:11px; letter-spacing:3px; color:rgba(255,255,255,0.2); margin-top:20px; }
+  </style>
+</head>
+<body>
+
+<div id="selectScreen">
+  <div class="skull">💀</div>
+  <div class="eyebrow">⚠ GAME OVER ⚠</div>
+  <div class="loser-name">DANNY</div>
+  <div class="subtitle">FINISHED LAST</div>
+  <div class="tagline">The night is over, Danny.<br>Now it's time to pay. 😈</div>
+  <div class="instruction">// Choose your punishment //</div>
+
+  <div class="list">
+    <div class="option" onclick="pick(0)">
+      <div class="option-num">1</div>
+      <div class="option-name">⚡ Period Simulator</div>
+      <div class="option-desc">Level 7. No skipping. No mercy.</div>
+    </div>
+    <div class="option" onclick="pick(1)">
+      <div class="option-num">2</div>
+      <div class="option-name">🌊 Nudie Into the Ocean</div>
+      <div class="option-desc">Full send. Clothes stay on shore.</div>
+    </div>
+    <div class="option" onclick="pick(2)">
+      <div class="option-num">3</div>
+      <div class="option-name">🍺 Root Beer Mile</div>
+      <div class="option-desc">4 root beers. 4 laps. No stopping.</div>
+    </div>
+    <div class="option" onclick="pick(3)">
+      <div class="option-num">4</div>
+      <div class="option-name">🌶️ One Chip Challenge</div>
+      <div class="option-desc">One chip. All the pain. No water for 5 min.</div>
+    </div>
+  </div>
+
+  <button class="confirm-btn" id="confirmBtn" onclick="confirm()">// LOCK IT IN //</button>
+</div>
+
+<div class="chosen" id="chosenScreen">
+  <div class="chosen-icon" id="chosenIcon">💀</div>
+  <div class="chosen-label">PUNISHMENT LOCKED IN</div>
+  <div class="chosen-name" id="chosenName">—</div>
+  <div class="chosen-desc" id="chosenDesc">—</div>
+  <div class="sign-off">No Sleep. No Mercy. Level 30. 🎂</div>
+</div>
+
+<script>
+  const PUNISHMENTS = [
+    { icon:'⚡', name:'Period Simulator', desc:'Level 7. No skipping. No mercy. Feel every volt.' },
+    { icon:'🌊', name:'Nudie Into the Ocean', desc:'Full send. Clothes stay on shore. Everyone watches.' },
+    { icon:'🍺', name:'Root Beer Mile', desc:'4 root beers. 4 laps. You finish both or it doesn\'t count.' },
+    { icon:'🌶️', name:'One Chip Challenge', desc:'One chip. All the pain. No water for 5 minutes. Good luck.' }
+  ];
+
+  let selected = null;
+
+  function pick(idx) {
+    selected = idx;
+    document.querySelectorAll('.option').forEach((el,i) => el.classList.toggle('selected', i === idx));
+    document.getElementById('confirmBtn').classList.add('show');
+  }
+
+  function confirm() {
+    if (selected === null) return;
+    const p = PUNISHMENTS[selected];
+    document.getElementById('selectScreen').style.display = 'none';
+    document.getElementById('chosenIcon').textContent = p.icon;
+    document.getElementById('chosenName').textContent = p.name;
+    document.getElementById('chosenDesc').textContent = p.desc;
+    document.getElementById('chosenScreen').classList.add('show');
+  }
+</script>
+</body>
+</html>

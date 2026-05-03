@@ -1726,30 +1726,32 @@
   }
 
   // ======= BONUS CHALLENGES =======
+  // General challenges — any player. Danny-specific ones blocked for Danny 🎂
   const BONUS_CHALLENGES = [
-    "Get another player to say the word \"GALAXY\" without them realizing what you're doing",
-    "Get a player to look at the circle below your waist 👀",
-    "Pants somebody at the table",
-    "Get someone to say \"I give up\" during the next round",
-    "Get another player to high five you using their left hand only",
-    "Make another player laugh without saying anything — no words allowed",
-    "Get a player to say your full name out loud",
-    "Get someone to stand up from their seat without asking them directly",
-    "Get another player to say the word \"absolutely\"",
-    "Make a player do a double take — they have to look at something twice",
-    "Get someone to point at the ceiling",
-    "Get a player to say \"no way\" during normal conversation",
-    "Get another player to fist bump you without asking for one",
-    "Make someone say \"what?\" to you — without yelling",
-    "Get a player to repeat something they just said",
-    "Get someone to check their phone without you telling them to",
-    "Get a player to say any number between 1 and 10",
-    "Get another player to look out a window or at a door",
-    "Make a player say \"seriously??\"",
-    "Get someone to shake their head no during conversation"
+    { text: 'Get another player to say the word "GALAXY" without them realizing what you're doing', danny: false },
+    { text: 'Get a player to look at the circle below your waist 👀', danny: false },
+    { text: 'Get someone to say "I give up" during the next round', danny: false },
+    { text: 'Get another player to high five you using their left hand only', danny: false },
+    { text: 'Make another player laugh without saying anything — no words allowed', danny: false },
+    { text: 'Get a player to say your full name out loud', danny: false },
+    { text: 'Get someone to stand up from their seat without asking them directly', danny: false },
+    { text: 'Get another player to say the word "absolutely"', danny: false },
+    { text: 'Make a player do a double take — they have to look at something twice', danny: false },
+    { text: 'Get someone to point at the ceiling', danny: false },
+    { text: 'Get a player to say "no way" during normal conversation', danny: false },
+    { text: 'Get another player to fist bump you without asking for one', danny: false },
+    { text: 'Make someone say "what?" to you — without yelling', danny: false },
+    { text: 'Get a player to repeat something they just said', danny: false },
+    { text: 'Get a player to say any number between 1 and 10', danny: false },
+    { text: 'Make a player say "seriously??"', danny: false },
+    { text: 'Get someone to shake their head no during conversation', danny: false },
+    // 🎂 Danny birthday specials — Carson, Wyatt & Chris only
+    { text: 'Pants Danny — it's his birthday, he deserves it 🎂', danny: true },
+    { text: 'Get Danny to look at the circle below your waist 👀 — birthday tax', danny: true },
+    { text: 'Get Danny to say "I'm getting too old for this" without asking him directly 🎂', danny: true }
   ];
 
-  const MAX_CHALLENGES = 3;
+    const MAX_CHALLENGES = 3;
   let activeChallengeId = null;
 
   // Random challenge timing — fires between 8-20 min, then 15-30 min gaps
@@ -1772,15 +1774,19 @@
 
     if (received.length >= MAX_CHALLENGES) return;
 
-    // Pick a challenge not already used by this player
     const used = received.map(c => c.id);
-    const available = BONUS_CHALLENGES.filter((_, i) => !used.includes(i));
+    const available = BONUS_CHALLENGES.filter((c, i) => {
+      if (used.includes(i)) return false;
+      if (c.danny && PLAYER === 'Danny') return false; // Danny never gets his own challenges
+      return true;
+    });
     if (available.length === 0) return;
 
-    const idx = BONUS_CHALLENGES.indexOf(available[Math.floor(Math.random() * available.length)]);
+    const chosen = available[Math.floor(Math.random() * available.length)];
+    const idx = BONUS_CHALLENGES.indexOf(chosen);
     activeChallengeId = idx;
 
-    document.getElementById('challengeText').textContent = BONUS_CHALLENGES[idx];
+    document.getElementById('challengeText').textContent = chosen.text;
     document.getElementById('challengeOverlay').classList.add('active');
   }
 
@@ -1837,7 +1843,7 @@
     strip.classList.add('show');
     items.innerHTML = received.map((c, i) => `
       <div class="challenge-strip-item">
-        <span>${BONUS_CHALLENGES[c.id].substring(0, 45)}...</span>
+        <span>${(BONUS_CHALLENGES[c.id]?.text || "").substring(0, 48)}...</span>
         <span class="${c.completed ? 'done' : 'skipped'}">${c.completed ? '-1 ✓' : 'skipped'}</span>
       </div>
     `).join('');

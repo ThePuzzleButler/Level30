@@ -827,7 +827,7 @@
           const s = getGameState();
           if (!s.players[PLAYER].challengesReceived) s.players[PLAYER].challengesReceived = [];
           if (s.players[PLAYER].challengesReceived.length >= MAX_CHALLENGES) return;
-          const idx = CHALLENGES.findIndex(c => c.text.includes('Pants Danny'));
+          const idx = CHALLENGES.findIndex(c => c.text.includes('look at the circle') && c.text.includes('Wyatt'));
           if (idx === -1) { triggerChallenge(); return; }
           activeChallengeIdx = idx;
           document.getElementById('challengeText').textContent = CHALLENGES[idx].text;

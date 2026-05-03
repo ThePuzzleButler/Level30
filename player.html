@@ -248,6 +248,34 @@
     /* ===== TOAST ===== */
     .toast { position: fixed; top: 80px; left: 50%; transform: translateX(-50%) translateY(-100px); background: #0a0a1a; border: 1px solid var(--gold); padding: 14px 24px; font-family: 'Orbitron', monospace; font-size: 11px; letter-spacing: 2px; color: var(--gold); z-index: 1000; transition: transform 0.4s; text-align: center; max-width: 320px; }
     .toast.show { transform: translateX(-50%) translateY(0); }
+
+    /* ===== BONUS CHALLENGE OVERLAY ===== */
+    .challenge-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.97);
+      z-index: 3000; display: none; flex-direction: column;
+      align-items: center; justify-content: center;
+      text-align: center; padding: 30px;
+    }
+    .challenge-overlay.active { display: flex; }
+    .challenge-overlay::before {
+      content: ''; position: absolute; inset: 0;
+      background: radial-gradient(ellipse at center, rgba(0,255,136,0.07), transparent 70%);
+      pointer-events: none;
+    }
+    .ch-star { font-size: 70px; margin-bottom: 14px; animation: ch-spin 3s linear infinite; }
+    @keyframes ch-spin { 0%{transform:rotate(0deg)} 100%{transform:rotate(360deg)} }
+    .ch-badge { font-family:'Orbitron',monospace; font-size:10px; letter-spacing:5px; color:#00ff88; border:1px solid #00ff88; padding:6px 16px; margin-bottom:18px; }
+    .ch-title { font-family:'Bebas Neue',sans-serif; font-size:50px; letter-spacing:4px; color:#00ff88; margin-bottom:6px; }
+    .ch-reward { font-family:'Orbitron',monospace; font-size:13px; color:var(--gold); letter-spacing:2px; margin-bottom:26px; }
+    .ch-card { background:rgba(0,255,136,0.05); border:1px solid rgba(0,255,136,0.3); padding:26px 30px; max-width:420px; width:100%; margin-bottom:26px; }
+    .ch-text { font-size:17px; line-height:1.8; color:#fff; }
+    .ch-hint { font-family:'Orbitron',monospace; font-size:10px; letter-spacing:2px; color:rgba(255,255,255,0.25); margin-bottom:22px; }
+    .ch-btns { display:flex; gap:12px; max-width:420px; width:100%; }
+    .ch-btn { flex:1; font-family:'Orbitron',monospace; font-size:11px; letter-spacing:2px; padding:16px 10px; border:1px solid; background:transparent; cursor:pointer; transition:all 0.2s; clip-path:polygon(8px 0%,100% 0%,calc(100% - 8px) 100%,0% 100%); }
+    .ch-btn.done { border-color:#00ff88; color:#00ff88; }
+    .ch-btn.done:hover { background:rgba(0,255,136,0.15); box-shadow:0 0 20px rgba(0,255,136,0.3); }
+    .ch-btn.skip { border-color:rgba(255,255,255,0.2); color:rgba(255,255,255,0.3); }
+    .ch-btn.skip:hover { border-color:rgba(255,255,255,0.4); color:rgba(255,255,255,0.6); }
   </style>
 </head>
 <body>
@@ -302,6 +330,23 @@
     <div class="punishment-chosen-desc" id="chosenDesc">—</div>
     <div class="punishment-final-scores" id="finalScores"></div>
     <div style="font-family:'Orbitron',monospace;font-size:10px;letter-spacing:3px;color:rgba(255,255,255,0.2);">No Sleep. No Mercy. Level 30.</div>
+  </div>
+</div>
+
+
+<!-- Bonus Challenge Overlay -->
+<div class="challenge-overlay" id="challengeOverlay">
+  <div class="ch-star">⭐</div>
+  <div class="ch-badge">// BONUS CHALLENGE //</div>
+  <div class="ch-title">SIDE QUEST</div>
+  <div class="ch-reward">Complete it → -1 point 🏆</div>
+  <div class="ch-card">
+    <div class="ch-text" id="challengeText">—</div>
+  </div>
+  <div class="ch-hint">Complete before the next round ends</div>
+  <div class="ch-btns">
+    <button class="ch-btn done" onclick="completeChallenge()">✓ DID IT</button>
+    <button class="ch-btn skip" onclick="skipChallenge()">✗ Skip</button>
   </div>
 </div>
 
@@ -738,6 +783,90 @@
     render();
   }
 
+
+  // ===== BONUS CHALLENGES =====
+  const CHALLENGES = [
+    { text: 'Pants any player of your choice before the next round ends', danny: false },
+    { text: 'Get any player to tell you how old they are — twice. They can\'t know why.', danny: false },
+    { text: 'Get any player to spell their own name out loud', danny: false },
+    { text: 'Get any player to look at the circle below your waist 👀', danny: false },
+    { text: 'Get any player to look at the circle below your waist 👀 — then punch them (light tap counts)', danny: false },
+    { text: 'Pants Danny — birthday tax 🎂', danny: true },
+    { text: 'Get Danny to tell you how old he is — twice. He can\'t know why.', danny: true },
+    { text: 'Get Danny to look at the circle below your waist 👀 then punch him (light tap) 🎂', danny: true },
+    { text: 'Get Danny to spell his own name out loud', danny: true },
+    { text: 'Get Carson to look at the circle below your waist 👀', danny: false },
+    { text: 'Get Wyatt to look at the circle below your waist 👀', danny: false },
+    { text: 'Get Chris to look at the circle below your waist 👀', danny: false },
+    { text: 'Pants Carson before the next round ends', danny: false },
+    { text: 'Pants Wyatt before the next round ends', danny: false },
+    { text: 'Pants Chris before the next round ends', danny: false },
+    { text: 'Get any player to say a phrase you choose — without telling them it\'s a challenge', danny: false },
+    { text: 'Get any player to say the word "absolutely" in normal conversation', danny: false },
+    { text: 'Get any player to say "no way" before the round ends — they can\'t know', danny: false },
+    { text: 'Make any player laugh without saying a single word', danny: false },
+    { text: 'Get any player to fist bump you using only their pinky finger', danny: false },
+  ];
+
+  const MAX_CHALLENGES = 3;
+  let activeChallengeIdx = null;
+
+  function scheduleChallenge() {
+    const state = getGameState();
+    const received = state.players[PLAYER].challengesReceived || [];
+    if (received.length >= MAX_CHALLENGES) return;
+    // Fire between 10 and 30 minutes randomly
+    const delay = (10 + Math.random() * 20) * 60 * 1000;
+    setTimeout(triggerChallenge, delay);
+  }
+
+  function triggerChallenge() {
+    const state = getGameState();
+    if (!state.players[PLAYER].challengesReceived) state.players[PLAYER].challengesReceived = [];
+    const received = state.players[PLAYER].challengesReceived;
+    if (received.length >= MAX_CHALLENGES) return;
+
+    const usedIds = received.map(c => c.id);
+    const available = CHALLENGES.filter((c, i) => {
+      if (usedIds.includes(i)) return false;
+      if (c.danny && PLAYER === 'Danny') return false;
+      return true;
+    });
+    if (available.length === 0) return;
+
+    const chosen = available[Math.floor(Math.random() * available.length)];
+    activeChallengeIdx = CHALLENGES.indexOf(chosen);
+    document.getElementById('challengeText').textContent = chosen.text;
+    document.getElementById('challengeOverlay').classList.add('active');
+  }
+
+  function completeChallenge() {
+    if (activeChallengeIdx === null) return;
+    const state = getGameState();
+    const player = state.players[PLAYER];
+    if (!player.challengesReceived) player.challengesReceived = [];
+    player.challengesReceived.push({ id: activeChallengeIdx, completed: true });
+    player.totalPoints = Math.max(0, player.totalPoints - 1);
+    activeChallengeIdx = null;
+    document.getElementById('challengeOverlay').classList.remove('active');
+    saveGameState(state);
+    syncScore();
+    showToast('🌟 Challenge complete! -1 point earned!');
+    render();
+    scheduleChallenge();
+  }
+
+  function skipChallenge() {
+    if (activeChallengeIdx === null) return;
+    const state = getGameState();
+    if (!state.players[PLAYER].challengesReceived) state.players[PLAYER].challengesReceived = [];
+    state.players[PLAYER].challengesReceived.push({ id: activeChallengeIdx, completed: false });
+    activeChallengeIdx = null;
+    document.getElementById('challengeOverlay').classList.remove('active');
+    saveGameState(state);
+    scheduleChallenge();
+  }
+
   // ===== BOOT =====
   render();
   checkOverlay();
@@ -745,6 +874,7 @@
     document.getElementById('adminSection').classList.add('danny-only');
     document.getElementById('adminSectionHeader').style.display = 'block';
   }
+  scheduleChallenge();
   startPolling(() => { render(); checkOverlay(); });
 </script>
 </body>
